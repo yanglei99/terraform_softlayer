@@ -46,6 +46,7 @@ eventually install software.
 |Docker Installation | dcos_install_docker |false| Default behavior is for CoreOS which already includes docker installation. For other OS, set it to true.|
 |Wait Time|wait_time_vm|15| You may need to adjust the value to make sure remote provisioner actions only start after VM is ready.|
 |Logging| dcos_install_logging|false | Set to true to enable [Logging Aggregation using ELK](./logging/README.md). Script is only tested for CENTOS. |
+|Monitoring| dcos_install_monitoring|false | Set to true to enable [Monitoring with cAdvisor,InfluxDB, Grafana](./monitoring/README.md).|
 
 
 ### Known issues and workaround

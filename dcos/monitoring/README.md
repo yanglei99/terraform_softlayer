@@ -1,4 +1,4 @@
-### Enable Monitoring with cAdvisor and Grafana on DC/OS
+### Enable Monitoring with cAdvisor, InfluxDB and Grafana on DC/OS
 
 Instruction [reference](https://github.com/dcos/examples/tree/master/1.8/cadvisor-influxdb-grafana)
 
