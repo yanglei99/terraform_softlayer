@@ -1,0 +1,17 @@
+{
+  "id": "elasticsearch",
+  "container": {
+    "docker": {
+      "image": "elasticsearch:latest",
+      "network": "HOST",
+      "privileged": true
+    }
+  },
+  "args": [],
+  "cpus": 2,
+  "mem": 2048,
+  "acceptedResourceRoles": ["slave_public"],
+  "env": {},
+  "instances": 1,
+  "constraints": [["hostname", "UNIQUE"]]
+} 

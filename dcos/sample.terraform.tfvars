@@ -2,7 +2,21 @@ softlayer_user = ""
 
 softlayer_api_key = ""
 
-datacenter = "mex01"
+softlayer_domain = "yl.softlayer.com"
+softlayer_datacenter = "mex01"
+
+
+softlayer_os_reference_code = "CENTOS_LATEST_64"
+softlayer_vm_user = "root"
+dcos_install_docker = true
+dcos_install_logging = false
+dcos_install_monitoring = false
+
+#softlayer_os_reference_code = "COREOS_LATEST_64"
+#softlayer_vm_user = "core"
+#dcos_install_docker = false
+#dcos_install_logging = false
+#dcos_install_monitoring = false
 
 master_cores= "2"
 master_memory = "4096"
@@ -33,5 +47,4 @@ dcos_ssh_key_path = "./do-key"
 
 dcos_ssh_public_key_path = "./do-key.pub"
 
-wait_time_masters=300
-wait_time_agent=15
+wait_time_vm=30

@@ -1,0 +1,44 @@
+{
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "google/cadvisor:latest"
+    },
+    "parameters": [],
+    "volumes": [
+      {
+        "containerPath": "/rootfs",
+        "hostPath": "/",
+        "mode": "RO"
+      },
+      {
+        "containerPath": "/var/run",
+        "hostPath": "/var/run",
+        "mode": "RW"
+      },
+      {
+        "containerPath": "/sys",
+        "hostPath": "/sys",
+        "mode": "RO"
+      },
+      {
+        "containerPath": "/var/lib/docker",
+        "hostPath": "/var/lib/docker",
+        "mode": "RO"
+      },
+      {
+        "containerPath": "/cgroup",
+        "hostPath": "/cgroup",
+        "mode": "RO"
+      }
+    ],
+    "network": "HOST"
+  },
+  "id": "cadvisor",
+  "instances": 5,
+  "cpus": 0,
+  "mem": 0,
+  "args" : ["-storage_driver=influxdb", "-storage_driver_host=influxdb.marathon.mesos:8086"],
+  "acceptedResourceRoles": ["slave_public", "*"],
+  "constraints": [["hostname", "UNIQUE"]]
+}

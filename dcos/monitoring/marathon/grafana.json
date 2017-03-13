@@ -1,0 +1,14 @@
+{
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "grafana/grafana:latest"
+    },
+    "network": "HOST"
+  },
+  "id": "grafana",
+  "instances": 1,
+  "cpus": 1,
+  "mem": 1024,
+  "acceptedResourceRoles": ["slave_public"]
+}

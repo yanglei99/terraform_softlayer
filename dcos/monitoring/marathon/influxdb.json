@@ -1,0 +1,14 @@
+{
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "influxdb:latest"
+    },
+    "network": "HOST"
+  },
+  "id": "influxdb",
+  "instances": 1,
+  "cpus": 2,
+  "mem": 2048,
+  "acceptedResourceRoles": ["slave_public"]
+}

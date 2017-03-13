@@ -7,9 +7,24 @@ variable "softlayer_api_key" {
   description = "Your Softlayer API key"
 }
 
-variable "datacenter" {
+variable "softlayer_domain" {
+  description = "Softlayer Domain"
+  default = "my.softlayer.com"
+}
+
+variable "softlayer_datacenter" {
   description = "Softlayer DataCenter"
   default = "mex01"
+}
+
+variable "softlayer_os_reference_code" {
+  description = "Softlayer OS reference code"
+  default = "COREOS_LATEST_64"
+}
+
+variable "softlayer_vm_user" {
+  description = "Softlayer OS VM user"
+  default = "core"
 }
 
 variable "agent_cores" {
@@ -111,12 +126,22 @@ variable "dcos_installer_url" {
   default = "https://downloads.dcos.io/dcos/EarlyAccess/dcos_generate_config.sh"
 }
 
-variable "wait_time_masters" {
-  description = "Wait time in second for all masters up"
-  default = "300"
+variable "wait_time_vm" {
+  description = "Wait time in second after VM up"
+  default = "15"
 }
 
-variable "wait_time_agent" {
-  description = "Wait time in second after agent VM up"
-  default = "15"
+variable "dcos_install_docker" {
+  description = "Need to install docker or not. COREOS has Docker already installed"
+  default = false
+}
+
+variable "dcos_install_logging" {
+  description = "Need to install logging (ELK) or not. Only tested on CENTOS"
+  default = false
+}
+
+variable "dcos_install_monitoring" {
+  description = "Need to install monitoring (cAdvisor + InfluxDB + Grafana) or not."
+  default = false
 }

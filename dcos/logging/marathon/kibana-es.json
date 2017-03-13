@@ -1,0 +1,19 @@
+{
+  "id": "kibana",
+  "container": {
+    "docker": {
+      "image": "kibana:latest",
+      "network": "HOST",
+      "privileged": true,
+      "parameters": []
+    }
+  },
+  "args": [],
+  "cpus": 1,
+  "mem": 1024,
+  "acceptedResourceRoles": ["slave_public"],
+  "env": {
+	  "ELASTICSEARCH_URL":"http://elasticsearch.marathon.mesos:9200"
+  },
+  "instances": 1
+} 
