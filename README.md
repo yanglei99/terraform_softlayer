@@ -2,21 +2,29 @@
 
 [Terraform Softlayer Provider](https://github.com/softlayer/terraform-provider-softlayer)
 
+
 ## Notes on environment setup
 
-* The latest Softlayer Provider binary download (1.3.0) does not work with Terraform 0.8.x. Workaround the issue by downloading terraform 0.7.x 
+* Download Terraform binary and set onto PATH
 
-* make sure the binary is executable
+* Download Terraform Softlayer Provider binary and enable it in `~/.terraformrc`. Make sure the binary is executable. 
 
-	chmod +x <the downloaded softlayer binary>
-
-
+	providers {
+    	softlayer = “/.../terraform-provider-softlayer_xxxx"
+	}
+	
 
 ## Scenarios
 
 * [Basic](basic/sl_basic.tf). Provision 2 VMs with a new SSH Key
 * [Auto Scale Group](asg/sl_asg.tf). Provision Auto Scale Group and reuse the created SSH Key
 * [Mesosphere DC/OS](dcos/README.md). Provision Mesosphere DC/OS cluster
+
+
+### Verified
+
+* Terraform: 0.8.7
+* Terraform Softlayer Provider: 1.4.1
 
 
 ### Useful Terraform Command

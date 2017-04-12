@@ -25,6 +25,6 @@ resource "softlayer_scale_group" "asg" {
       disks = [25]
       datacenter = "sjc03"
       post_install_script_uri = ""
-      ssh_key_ids = [789243]
+      ssh_key_ids = []
     }
 }
