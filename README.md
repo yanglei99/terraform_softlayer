@@ -5,14 +5,13 @@
 
 ## Notes on environment setup
 
-* Download Terraform binary and set onto PATH
+Download Terraform binary and set onto PATH
 
-* Download Terraform Softlayer Provider binary and enable it in `~/.terraformrc`. Make sure the binary is executable. 
+Download Terraform Softlayer Provider binary and enable it in `~/.terraformrc`. Make sure the binary is executable. 
 
 	providers {
     	softlayer = “/.../terraform-provider-softlayer_xxxx"
 	}
-	
 
 ## Scenarios
 
