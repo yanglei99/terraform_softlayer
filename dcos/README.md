@@ -53,3 +53,6 @@ eventually install software.
 
 * The provisioner connection host is currently set on public ip. If you have access to VM private IP, change the `host=` under `connection`
 
+* Make sure you have enough public agents when Logging and/or Monitoring are enabled
+
+
