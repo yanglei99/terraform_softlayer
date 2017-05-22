@@ -18,6 +18,7 @@ Download Terraform Softlayer Provider binary and enable it in `~/.terraformrc`. 
 * [Basic](basic/sl_basic.tf). Provision 2 VMs with a new SSH Key
 * [Auto Scale Group](asg/sl_asg.tf). Provision Auto Scale Group and reuse the created SSH Key
 * [Mesosphere DC/OS](dcos/README.md). Provision Mesosphere DC/OS cluster
+* [Data Ingestion Scenario](ingest/README.md). Provision Zookeeper, Spark, Kafka clusters for data ingestion.
 
 
 ### Verified
