@@ -34,11 +34,11 @@ resource "softlayer_virtual_guest" "test_server_2" {
     hostname = "server2"
     domain = "yl.softlayer.com"
     ssh_key_ids = ["${softlayer_ssh_key.terraform17.id}"]
-    os_reference_code = "CENTOS_LATEST_64"
+    os_reference_code = "WIN_LATEST_64"
     datacenter = "sjc03"
     hourly_billing = "true"
     local_disk = "true"
-    network_speed = 1000
+    network_speed = 100
     cores = 2
     memory = 4096
     disks =[100]
