@@ -104,3 +104,13 @@ variable "k8s_proxy_port" {
   description = "k8s local proxy port"
   default = 8001
 }
+
+variable "enable_local_k8s_proxy" {
+  description = "enable k8s local proxy"
+  default = true
+}
+
+variable "k8s_pod_network_cidr" {
+  description = "k8s pod_network_cidr"
+  default = ""
+}

@@ -28,3 +28,5 @@ ssh_public_key_path = "./do-key.pub"
 provision_vm_wait_time=30
 
 k8s_proxy_port = 8181
+enable_local_k8s_proxy = true
+k8s_pod_network_cidr = "11.32.0.0/12"

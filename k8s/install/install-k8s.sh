@@ -55,13 +55,15 @@ systemctl enable kubelet && systemctl start kubelet
 # https://github.com/kubernetes/kubernetes/issues/43815
 # https://github.com/kubernetes/kubernetes.github.io/issues/3159
 # https://github.com/kubernetes/kubernetes/issues/44665
+# https://github.com/kubernetes/kubeadm/issues/193
+# https://github.com/kubernetes/kubernetes/issues/34101
 
 echo fix v1.6.4 issue
 
 sysctl net.bridge.bridge-nf-call-iptables=1
 sysctl net.bridge.bridge-nf-call-ip6tables=1
- 
-sudo systemctl stop firewalld && sudo systemctl disable firewalld
+
+sysctl net.ipv4.conf.all.forwarding=1
 
 kubeadm reset
 

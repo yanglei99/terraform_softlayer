@@ -24,8 +24,8 @@ Download Terraform Softlayer Provider binary and enable it in `~/.terraformrc`. 
 
 ### Verified
 
-* Terraform: 0.8.7
-* Terraform Softlayer Provider: 1.4.1
+* Terraform: 0.9.8
+* Terraform Softlayer Provider: 1.5.1
 
 
 ### Useful Terraform Command

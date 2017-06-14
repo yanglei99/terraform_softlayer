@@ -59,19 +59,37 @@ resource "null_resource" "k8s_master_install" {
       destination = "/tmp/install-pod-network.sh"
     }
 
+    provisioner "file" {
+      source = "./install/weave-daemonset-k8s-1.6-fix.yaml"
+      destination = "/tmp/weave-daemonset-k8s-1.6-fix.yaml"
+    }
+ 
 	provisioner "remote-exec" {
 	    inline = [
 	       "echo install k8s on master && bash /tmp/install-k8s.sh > /tmp/install-k8s.log",
-	       "echo initialize k8s on master && bash /tmp/initialize-k8s.sh ${element(softlayer_virtual_guest.k8s_master.*.ipv4_address, count.index)} > /tmp/initialize-k8s.log",
-	       "echo install pod network on master && bash /tmp/install-pod-network.sh > /tmp/install-pod-network.log"
+	       "echo initialize k8s on master && bash /tmp/initialize-k8s.sh ${element(softlayer_virtual_guest.k8s_master.*.ipv4_address, count.index)} ${var.k8s_pod_network_cidr} > /tmp/initialize-k8s.log",
+	       "echo install pod network on master && bash /tmp/install-pod-network.sh /tmp/weave-daemonset-k8s-1.6-fix.yaml > /tmp/install-pod-network.log"
 	    ]
 	}
 
 	provisioner "local-exec" {
-	    command = "if [ ${count.index} = 0 ]; then echo initialize local environment && chmod +x ./install/initialize_local_env.sh  && . ./install/initialize_local_env.sh ${element(softlayer_virtual_guest.k8s_master.*.ipv4_address, count.index)} ${var.k8s_proxy_port}; fi"
+	    command = "echo initialize local environment && chmod +x ./install/initialize_local_env.sh  && . ./install/initialize_local_env.sh ${element(softlayer_virtual_guest.k8s_master.*.ipv4_address, 0)}"
 	}
 
 }
+
+resource "null_resource" "k8s_local_proxy" {
+
+    count         = "${var.enable_local_k8s_proxy}"
+
+    depends_on = ["null_resource.k8s_master_install"]
+
+	provisioner "local-exec" {
+	    command = "echo create local proxy && nohup kubectl proxy --port=${var.k8s_proxy_port} &"
+	}
+
+}
+
 
 resource "softlayer_virtual_guest" "k8s_worker" {
   
@@ -120,7 +138,7 @@ resource "null_resource" "k8s_worker_install" {
 	provisioner "remote-exec" {
 	    inline = [
 	        "echo install k8s on worker && bash /tmp/install-k8s.sh > /tmp/install-k8s.log",
-	    	"echo join k8s cluster&& bash /tmp/do-join-node.sh > /tmp/do-join-node.log"
+	    	"echo join k8s cluster && bash /tmp/do-join-node.sh > /tmp/do-join-node.log"
 	    ]
 	}
 }

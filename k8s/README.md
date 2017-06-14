@@ -36,9 +36,10 @@ Local environment (kubectl) is also enabled with proxy server.
 
 | Scenario | Configuration | Default Value | Notes|
 |----------|---------------|-------|------|
-|Wait Time for VM    | provision_vm_wait_time | 15 | You may need to adjust the value to make sure remote provisioner actions only start after VM is ready.|
-|K8s Proxy Port      | k8s_proxy_port     |8001  | Local proxy port|
-
+|Wait Time for VM       | provision_vm_wait_time    | 15           | Adjust the value to make sure remote provisioner actions only start after VM is ready.|
+|K8s Proxy Port         | k8s_proxy_port            | 8001         | Local proxy port|
+|Enable k8s local proxy | enable_local_k8s_proxy    | true         | enable local proxy|
+|K8s pod network range  | k8s_pod_network_cidr      |  | 10.32.0.0/12  |enable local proxy|
 
 ### Known issue, limitation and workaround
 

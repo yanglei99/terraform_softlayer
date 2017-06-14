@@ -1,7 +1,17 @@
 #!/bin/bash
-
  
-kubeadm init --apiserver-advertise-address=$1 | tee /tmp/k8s_init.out
+echo kubeadm init with $1, $2
+
+echo ignore use apiserver-advertise-address, as it can cause weave-net not started
+
+#kubeadm init --apiserver-advertise-address=$1 --pod-network-cidr=$2 | tee /tmp/k8s_init.out
+
+
+if [ "$2" = "" ]; then
+  kubeadm init  | tee /tmp/k8s_init.out
+else
+  kubeadm init --pod-network-cidr=$2 | tee /tmp/k8s_init.out
+fi
 
 echo get the join command
 
