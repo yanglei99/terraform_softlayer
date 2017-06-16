@@ -49,6 +49,23 @@ resource "null_resource" "k8s_master_install" {
       destination = "/tmp/install-k8s.sh"
     }
    
+	provisioner "remote-exec" {
+	    inline = [
+	       "echo install k8s on master && bash /tmp/install-k8s.sh ${var.k8s_cluster_dns} > /tmp/install-k8s.log"
+	    ]
+	}
+
+}
+
+resource "null_resource" "k8s_master_post_install" {
+
+    depends_on = ["null_resource.k8s_master_install"]
+    connection {
+      user = "${var.softlayer_vm_user}"
+      private_key = "${file(var.ssh_key_path)}"
+      host = "${element(softlayer_virtual_guest.k8s_master.*.ipv4_address, 0)}"
+    }
+    
     provisioner "file" {
       source = "./install/initialize-k8s.sh"
       destination = "/tmp/initialize-k8s.sh"
@@ -63,29 +80,27 @@ resource "null_resource" "k8s_master_install" {
       source = "./install/weave-daemonset-k8s-1.6-fix.yaml"
       destination = "/tmp/weave-daemonset-k8s-1.6-fix.yaml"
     }
- 
-	provisioner "remote-exec" {
+
+ 	provisioner "remote-exec" {
 	    inline = [
-	       "echo install k8s on master && bash /tmp/install-k8s.sh > /tmp/install-k8s.log",
-	       "echo initialize k8s on master && bash /tmp/initialize-k8s.sh ${element(softlayer_virtual_guest.k8s_master.*.ipv4_address, count.index)} ${var.k8s_pod_network_cidr} > /tmp/initialize-k8s.log",
-	       "echo install pod network on master && bash /tmp/install-pod-network.sh /tmp/weave-daemonset-k8s-1.6-fix.yaml > /tmp/install-pod-network.log"
+	       "echo initialize k8s on master && bash /tmp/initialize-k8s.sh ${element(softlayer_virtual_guest.k8s_master.*.ipv4_address, count.index)} ${var.k8s_service_cidr} > /tmp/initialize-k8s.log",
+	       "echo install pod network on master && bash /tmp/install-pod-network.sh \"${var.k8s_weave_iprange}\" \"${var.k8s_weave_monitor_service_token}\" >> /tmp/initialize-k8s.log"
 	    ]
 	}
-
-	provisioner "local-exec" {
-	    command = "echo initialize local environment && chmod +x ./install/initialize_local_env.sh  && . ./install/initialize_local_env.sh ${element(softlayer_virtual_guest.k8s_master.*.ipv4_address, 0)}"
-	}
-
+    
 }
 
-resource "null_resource" "k8s_local_proxy" {
+resource "null_resource" "k8s_master_local_env" {
 
-    count         = "${var.enable_local_k8s_proxy}"
-
-    depends_on = ["null_resource.k8s_master_install"]
-
+    depends_on = ["null_resource.k8s_master_post_install"]
+    connection {
+      user = "${var.softlayer_vm_user}"
+      private_key = "${file(var.ssh_key_path)}"
+      host = "${element(softlayer_virtual_guest.k8s_master.*.ipv4_address, 0)}"
+    }
+    
 	provisioner "local-exec" {
-	    command = "echo create local proxy && nohup kubectl proxy --port=${var.k8s_proxy_port} &"
+	    command = "echo initialize local environment && chmod +x ./install/initialize_local_env.sh  && . ./install/initialize_local_env.sh ${element(softlayer_virtual_guest.k8s_master.*.ipv4_address, 0)} \"${var.k8s_proxy_port}\" "
 	}
 
 }
@@ -117,7 +132,7 @@ resource "softlayer_virtual_guest" "k8s_worker" {
 resource "null_resource" "k8s_worker_install" {
 
     count = "${var.worker_count}"
-    depends_on = ["softlayer_virtual_guest.k8s_worker","null_resource.k8s_master_install"]
+    depends_on = ["softlayer_virtual_guest.k8s_worker","null_resource.k8s_master_post_install"]
     connection {
       user = "${var.softlayer_vm_user}"
       private_key = "${file(var.ssh_key_path)}"

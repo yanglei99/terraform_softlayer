@@ -36,14 +36,17 @@ Local environment (kubectl) is also enabled with proxy server.
 
 | Scenario | Configuration | Default Value | Notes|
 |----------|---------------|-------|------|
-|Wait Time for VM       | provision_vm_wait_time    | 15           | Adjust the value to make sure remote provisioner actions only start after VM is ready.|
-|K8s Proxy Port         | k8s_proxy_port            | 8001         | Local proxy port|
-|Enable k8s local proxy | enable_local_k8s_proxy    | true         | enable local proxy|
-|K8s pod network range  | k8s_pod_network_cidr      |  | 10.32.0.0/12  |enable local proxy|
+|Wait Time for VM        | provision_vm_wait_time           | 15           | Adjust the value to make sure remote provisioner actions only start after VM is ready.|
+|K8s Proxy Port          | k8s_proxy_port                   | "8001"       | Local proxy port. set to "" will disable the enablement |
+|K8s weave pod ip range  | k8s_weave_iprange                | ""           | Set to non-empty to bypass weave default colliding with Softlayer private ip|
+|K8s service ip range    | k8s_service_cidr                 | ""           | Set to non-empty to bypass default value colliding with Softlayer private ip|
+|K8s cluster dns         | k8s_cluster_dns                  | ""           | Set to non-empty to bypass service default value colliding with Softlayer private ip|
+|K8s Weave Monitor Token | k8s_weave_monitor_service_token  | ""           | set to non-empty string to create Weave Monitor agent |
+
 
 ### Known issue, limitation and workaround
 
 * Provision has specific code for CENTOS and alike
 * Only provision single master 
 * The provisioner connection host is currently set on public ip. 
-* [Addition code](install/install-k8s.sh) is added for solving v1.6.4 issues
+* [Additional code](install/install-k8s.sh) is added for solving v1.6.4 issues

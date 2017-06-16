@@ -1,7 +1,6 @@
 #!/bin/bash
  
 echo reference https://kubernetes.io/docs/setup/independent/install-kubeadm/
-
 echo Install docker v1.12.6: http://www.installvirtual.com/how-to-install-docker-1-12-on-centos-7/
 
 sudo yum update -y
@@ -69,7 +68,17 @@ kubeadm reset
 
 mv /etc/systemd/system/kubelet.service.d/10-kubeadm.conf  /etc/systemd/system/kubelet.service.d/10-kubeadm.conf.bak
 sed 's/\$KUBELET_NETWORK_ARGS//g' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf.bak > /etc/systemd/system/kubelet.service.d/10-kubeadm.conf.1
-sed 's/systemd/cgroupfs/g' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf.1 > /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+sed 's/systemd/cgroupfs/g' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf.1 > /etc/systemd/system/kubelet.service.d/10-kubeadm.conf.2
+
+
+if [ -n "$1" ]; then
+  echo --cluster-dns=10.96.0.10 change to $1
+  sed 's/10.96.0.10/'$1'/g' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf.2 > /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+else
+  cp /etc/systemd/system/kubelet.service.d/10-kubeadm.conf.2 /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+fi
+
+
 cat /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 
 systemctl daemon-reload

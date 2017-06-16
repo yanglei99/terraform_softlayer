@@ -102,15 +102,25 @@ variable "provision_vm_wait_time" {
 
 variable "k8s_proxy_port" {
   description = "k8s local proxy port"
-  default = 8001
+  default = "8001"
 }
 
-variable "enable_local_k8s_proxy" {
-  description = "enable k8s local proxy"
-  default = true
+variable "k8s_weave_iprange" {
+  description = "k8s weave IPALLOC_RANGE"
+  default = ""
 }
 
-variable "k8s_pod_network_cidr" {
-  description = "k8s pod_network_cidr"
+variable "k8s_service_cidr" {
+  description = "k8s service-cidr"
+  default = ""
+}
+
+variable "k8s_cluster_dns" {
+  description = "k8s cluster-dns"
+  default = ""
+}
+
+variable "k8s_weave_monitor_service_token"{
+  description = "enable k8s weave network monitor with the token"
   default = ""
 }
