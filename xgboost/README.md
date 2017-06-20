@@ -91,12 +91,10 @@ XGBoost is download and built at `/root/xgboost` on all nodes
 	s3cmd put /root/xgboost/demo/data/agaricus.txt.train s3://xgboost/xgb-demo/train
 	s3cmd put /root/xgboost/demo/data/agaricus.txt.test s3://xbboost/xgb-demo/test
 	
-* Create Spark Hadoop S3 configuration in `myspark.properties`
+* Create Spark Hadoop S3 configuration 
 
-	spark.hadoop.fs.s3a.impl        org.apache.hadoop.fs.s3a.S3AFileSystem
-	spark.hadoop.fs.s3a.access.key  YOUR_KEY
-	spark.hadoop.fs.s3a.secret.key  YOUR_SECRET
-	spark.hadoop.fs.s3a.endpoint    s3-api.us-geo.objectstorage.softlayer.net
+[reference myspark.properties](myspark.properties)
+
 
 * Spark Submit
 
