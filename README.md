@@ -20,6 +20,7 @@ Download Terraform Softlayer Provider binary and enable it in `~/.terraformrc`. 
 * [Mesosphere DC/OS](dcos/README.md). Provision Mesosphere DC/OS cluster
 * [Data Ingestion Scenario](ingest/README.md). Provision Zookeeper, Spark, Kafka clusters for data ingestion.
 * [Kubernetes Scenario](k8s/README.md). Provision Kubernetes cluster
+* [XGBoost Scenario](xgboost/README.md). Provision XGBoost Spark Cluster
 
 
 ### Verified
