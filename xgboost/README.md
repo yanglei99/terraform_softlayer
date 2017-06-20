@@ -84,7 +84,7 @@ XGBoost is download and built at `/root/xgboost` on all nodes
 	
 	# set the same SPARK_MASTER as in the setenv.sh
 		
-* [Follow instruction](s3: https://knowledgelayer.softlayer.com/procedure/connecting-cos-s3-using-s3cmd) to enable s3cmd to access Softlayer Object Storage(s3)
+* [Follow instruction](https://knowledgelayer.softlayer.com/procedure/connecting-cos-s3-using-s3cmd) to enable s3cmd to access Softlayer Object Storage(s3)
 
 * upload test data
 
