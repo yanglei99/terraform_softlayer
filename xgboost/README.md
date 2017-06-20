@@ -103,5 +103,5 @@ XGBoost is download and built at `/root/xgboost` on all nodes
 
 ### Known issue, limitation and workaround
 
-* If you hit can not download libary during spark submit on master, you may need to remove both `~/.m2` and `~/.ivy2/cache` 
+* If you hit can not download library during spark submit on master, you may need to remove both `~/.m2` and `~/.ivy2/cache` 
 
