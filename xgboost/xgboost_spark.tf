@@ -43,11 +43,11 @@ resource "null_resource" "xgboost_master_env" {
 	}
 
 	provisioner "local-exec" {
-	    command = "echo SPARK_MASTER=\"spark://${var.master_public_ip ? join(",",formatlist("%s:7077",softlayer_virtual_guest.xgboost_master.*.ipv4_address)) : join(",",formatlist("%s:7077",softlayer_virtual_guest.xgboost_master.*.ipv4_address_private))}\" >> setenv.sh"
+	    command = "echo export SPARK_MASTER=\"spark://${var.master_public_ip ? join(",",formatlist("%s:7077",softlayer_virtual_guest.xgboost_master.*.ipv4_address)) : join(",",formatlist("%s:7077",softlayer_virtual_guest.xgboost_master.*.ipv4_address_private))}\" >> setenv.sh"
 	}
 	
 	provisioner "local-exec" {
-	    command = "echo SPARK_MASTER_CLUSTER=\"spark://${var.master_public_ip ? join(",",formatlist("%s:6066",softlayer_virtual_guest.xgboost_master.*.ipv4_address)) : join(",",formatlist("%s:6066",softlayer_virtual_guest.xgboost_master.*.ipv4_address_private))}\" >> setenv.sh"
+	    command = "echo export SPARK_MASTER_CLUSTER=\"spark://${var.master_public_ip ? join(",",formatlist("%s:6066",softlayer_virtual_guest.xgboost_master.*.ipv4_address)) : join(",",formatlist("%s:6066",softlayer_virtual_guest.xgboost_master.*.ipv4_address_private))}\" >> setenv.sh"
 	}
 	
 	provisioner "local-exec" {

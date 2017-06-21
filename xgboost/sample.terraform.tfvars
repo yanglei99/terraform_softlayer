@@ -21,7 +21,7 @@ worker_disk = ["100"]
 worker_network = 1000
 
 master_count = "1"
-worker_count = "2"
+worker_count = "3"
 
 ssh_key_path = "./do-key"
 ssh_public_key_path = "./do-key.pub"
