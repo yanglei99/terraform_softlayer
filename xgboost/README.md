@@ -67,14 +67,6 @@ Output would calculate SPARK_MASTER and ZK_MASTER, besides the list of master-ip
 XGBoost is download and built at `/root/xgboost` on all nodes
 
 
-#### Upload test data to Object Storage (s3)
-
-[Follow instruction](https://knowledgelayer.softlayer.com/procedure/connecting-cos-s3-using-s3cmd) to enable s3cmd to access Softlayer Object Storage(s3). Then upload test data
-
-	s3cmd put /root/xgboost/demo/data/agaricus.txt.train s3://xgboost/xgb-demo/train
-	s3cmd put /root/xgboost/demo/data/agaricus.txt.test s3://xgboost/xgb-demo/test
-	
-
 #### Prepare the Spark Submission Environment
 
 	# copy spark submission environment setup
@@ -88,6 +80,14 @@ XGBoost is download and built at `/root/xgboost` on all nodes
 	# set the spark submission environment
 	
 	. ./setenv-spark-driver.sh
+
+#### Upload test data to Object Storage (s3)
+
+[Follow instruction](https://knowledgelayer.softlayer.com/procedure/connecting-cos-s3-using-s3cmd) to enable s3cmd to access Softlayer Object Storage(s3). Then upload test data
+
+	s3cmd put /root/xgboost/demo/data/agaricus.txt.train s3://xgboost/xgb-demo/train
+	s3cmd put /root/xgboost/demo/data/agaricus.txt.test s3://xgboost/xgb-demo/test
+	
 
 #### Spark Job Submission with local test data
 
