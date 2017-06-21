@@ -109,4 +109,9 @@ variable "install_docker" {
   default = false
 }
 
+variable "master_public_ip" {
+  description = "Use public ip for spark master"
+  default = true
+}
+
 

@@ -42,10 +42,10 @@ As Docker container is used for some of the provision, Docker are installed on a
 
 [make-files](make-files.sh)
 
-* Exhibitor Web UI start at : 8181
+* Exhibitor Web UI start on master at : 8181
 * Spark Master Web UI at: 8080
 * Spark Worker Web UI at: 8081
-* Spark Master port: 7077, cluster submission port: 6066
+* Spark Master port: 7077, cluster mode submission port: 6066
 
 Output would calculate SPARK_MASTER and ZK_MASTER, besides the list of master-ip and worker-ip. You can use `terraform show` to see them
 	
@@ -65,7 +65,7 @@ XGBoost is download and built at `/root/xgboost` on all nodes
 
     . ./setenv.sh
     
-	spark-submit --class  ml.dmlc.xgboost4j.scala.example.spark.SparkWithDataFrame --master $SPARK_MASTER --driver-class-path /root/xgboost/jvm-packages/xgboost4j-spark/target/xgboost4j-spark-0.7-jar-with-dependencies.jar --conf spark.executor.extraClassPath=/root/xgboost/jvm-packages/xgboost4j-spark/target/xgboost4j-spark-0.7-jar-with-dependencies.jar  --deploy-mode cluster /root/xgboost/jvm-packages/xgboost4j-example/target/xgboost4j-example-0.7.jar 100 2 /root/xgboost/demo/data/agaricus.txt.train /root/xgboost/demo/data/agaricus.txt.test
+	spark-submit --class  ml.dmlc.xgboost4j.scala.example.spark.SparkWithDataFrame --master $SPARK_MASTER_CLUSTER --driver-class-path /root/xgboost/jvm-packages/xgboost4j-spark/target/xgboost4j-spark-0.7-jar-with-dependencies.jar --conf spark.executor.extraClassPath=/root/xgboost/jvm-packages/xgboost4j-spark/target/xgboost4j-spark-0.7-jar-with-dependencies.jar  --deploy-mode cluster /root/xgboost/jvm-packages/xgboost4j-example/target/xgboost4j-example-0.7.jar 100 2 /root/xgboost/demo/data/agaricus.txt.train /root/xgboost/demo/data/agaricus.txt.test
 	
 
 	
@@ -74,7 +74,7 @@ XGBoost is download and built at `/root/xgboost` on all nodes
 	ssh -i do-key root@$MASTER_IP
 	
 	# set the same SPARK_MASTER as in the setenv.sh
-
+	
 	spark-submit --class  ml.dmlc.xgboost4j.scala.example.spark.SparkWithDataFrame --master $SPARK_MASTER --jars /root/xgboost/jvm-packages/xgboost4j-spark/target/xgboost4j-spark-0.7-jar-with-dependencies.jar /root/xgboost/jvm-packages/xgboost4j-example/target/xgboost4j-example-0.7.jar 100 2 /root/xgboost/demo/data/agaricus.txt.train /root/xgboost/demo/data/agaricus.txt.test
 	
 
@@ -84,24 +84,18 @@ XGBoost is download and built at `/root/xgboost` on all nodes
 	
 	# set the same SPARK_MASTER as in the setenv.sh
 		
-* [Follow instruction](https://knowledgelayer.softlayer.com/procedure/connecting-cos-s3-using-s3cmd) to enable s3cmd to access Softlayer Object Storage(s3)
-
-* upload test data
+[Follow instruction](https://knowledgelayer.softlayer.com/procedure/connecting-cos-s3-using-s3cmd) to enable s3cmd to access Softlayer Object Storage(s3). Then upload test data
 
 	s3cmd put /root/xgboost/demo/data/agaricus.txt.train s3://xgboost/xgb-demo/train
 	s3cmd put /root/xgboost/demo/data/agaricus.txt.test s3://xbboost/xgb-demo/test
 	
-* Create Spark Hadoop S3 configuration 
+Create Spark Hadoop S3 configuration. [reference myspark.properties](myspark.properties), then Spark Submit
 
-[reference myspark.properties](myspark.properties)
-
-
-* Spark Submit
-
-	spark-submit --class  ml.dmlc.xgboost4j.scala.example.spark.SparkWithDataFrame --master $SPARK_MASTER --jars /root/xgboost/jvm-packages/xgboost4j-spark/target/xgboost4j-spark-0.7-jar-with-dependencies.jar --packages org.apache.hadoop:hadoop-aws:2.7.3 --properties-file myspark.properties /root/xgboost/jvm-packages/xgboost4j-example/target/xgboost4j-example-0.7.jar 200 2 s3a://xgboost/xgb-demo/train s3a://xgboost/xgb-demo/test
+	spark-submit --class  ml.dmlc.xgboost4j.scala.example.spark.SparkWithDataFrame --master $SPARK_MASTER --jars /root/xgboost/jvm-packages/xgboost4j-spark/target/xgboost4j-spark-0.7-jar-with-dependencies.jar --packages org.apache.hadoop:hadoop-aws:2.7.3 --properties-file myspark.properties /root/xgboost/jvm-packages/xgboost4j-example/target/xgboost4j-example-0.7.jar 100 2 s3a://xgboost/xgb-demo/train s3a://xgboost/xgb-demo/test
 
 
 ### Known issue, limitation and workaround
 
 * If you hit can not download library during spark submit on master, you may need to remove both `~/.m2` and `~/.ivy2/cache` 
+* Master node iptables service is disabled due to a submission hung. Investigating
 

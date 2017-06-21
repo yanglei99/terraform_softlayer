@@ -16,22 +16,34 @@ cat > do-start-spark-master.sh << FIN
 echo "enable iptables"
 
 yum install -y iptables-services
+service iptables restart
 service iptables status
+chkconfig --level 345 iptables on
 
 iptables -nvL
 
+iptables -F
+iptables -P INPUT DROP
 iptables -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
 iptables -A INPUT -p tcp -m tcp --dport 6066 -j ACCEPT
 iptables -A INPUT -p tcp -m tcp --dport 7077 -j ACCEPT
 iptables -A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 8181 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 2181 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 2888 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 3888 -j ACCEPT
 iptables -A INPUT -i lo -j ACCEPT
 iptables -A INPUT -i eth0 -j ACCEPT
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-iptables -P INPUT DROP  
+iptables -A INPUT -j DROP
 
 service iptables save
+iptables -nvL
 
-echo "Start spark master on the node"
+# TODO
+service iptables stop
+
+echo "Start spark master on the node \$1"
 
 export SPARK_DAEMON_JAVA_OPTS="-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.url=$ZK_MASTER -Dspark.deploy.zookeeper.dir=/sparkha" 
 start-master.sh -h \$1 
@@ -39,27 +51,28 @@ FIN
 
 cat > do-start-spark-worker.sh << FIN
 #!/usr/bin/env bash
+
 echo "enable iptables"
 
 yum install -y iptables-services
+service iptables restart
 service iptables status
+chkconfig --level 345 iptables on
 
 iptables -nvL
 
+iptables -F
+iptables -P INPUT DROP
 iptables -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
-iptables -A INPUT -p tcp -m tcp --dport 6066 -j ACCEPT
-iptables -A INPUT -p tcp -m tcp --dport 7077 -j ACCEPT
 iptables -A INPUT -p tcp -m tcp --dport 8081 -j ACCEPT
 iptables -A INPUT -i lo -j ACCEPT
 iptables -A INPUT -i eth0 -j ACCEPT
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-iptables -P INPUT DROP  
+iptables -A INPUT -j DROP
 
 service iptables save
+iptables -nvL
 
-echo "enable iptables"
-
-/tmp/enable_iptables
-echo "Start spark worker on the node"
+echo "Start spark worker on the node \$1"
 start-slave.sh $SPARK_MASTER -h \$1
 FIN

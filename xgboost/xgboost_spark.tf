@@ -39,11 +39,15 @@ resource "null_resource" "xgboost_master_env" {
     depends_on = ["softlayer_virtual_guest.xgboost_master"]
 
 	provisioner "local-exec" {
-	    command = "echo ZK_MASTER=\"${join(",",formatlist("%s:2181",softlayer_virtual_guest.xgboost_master.*.ipv4_address))}\" > setenv.sh"
+	    command = "echo export ZK_MASTER=\"${join(",",formatlist("%s:2181",softlayer_virtual_guest.xgboost_master.*.ipv4_address))}\" > setenv.sh"
 	}
 
 	provisioner "local-exec" {
-	    command = "echo SPARK_MASTER=\"spark://${join(",",formatlist("%s:7077",softlayer_virtual_guest.xgboost_master.*.ipv4_address))}\" >> setenv.sh"
+	    command = "echo SPARK_MASTER=\"spark://${var.master_public_ip ? join(",",formatlist("%s:7077",softlayer_virtual_guest.xgboost_master.*.ipv4_address)) : join(",",formatlist("%s:7077",softlayer_virtual_guest.xgboost_master.*.ipv4_address_private))}\" >> setenv.sh"
+	}
+	
+	provisioner "local-exec" {
+	    command = "echo SPARK_MASTER_CLUSTER=\"spark://${var.master_public_ip ? join(",",formatlist("%s:6066",softlayer_virtual_guest.xgboost_master.*.ipv4_address)) : join(",",formatlist("%s:6066",softlayer_virtual_guest.xgboost_master.*.ipv4_address_private))}\" >> setenv.sh"
 	}
 	
 	provisioner "local-exec" {
@@ -137,7 +141,7 @@ resource "null_resource" "xgboost_master_start" {
     }
 
 	provisioner "remote-exec" {
-	    inline = "echo start spark master && bash /tmp/do-start-spark-master.sh ${element(softlayer_virtual_guest.xgboost_master.*.ipv4_address, count.index)} > /tmp/startSparkMaster.log"
+	    inline = "echo start spark master && bash /tmp/do-start-spark-master.sh ${ var.master_public_ip ? element(softlayer_virtual_guest.xgboost_master.*.ipv4_address, count.index) : element(softlayer_virtual_guest.xgboost_master.*.ipv4_address_private, count.index)} > /tmp/startSparkMaster.log"
 	}
 	
 }
