@@ -67,7 +67,7 @@ Output would calculate SPARK_MASTER and ZK_MASTER, besides the list of master-ip
 XGBoost is download and built at `/root/xgboost` on all nodes
 
 
-#### Prepare the Spark Submission Environment
+#### Prepare the Spark Submission Environment on a Master Node
 
 	# copy spark submission environment setup
 	
