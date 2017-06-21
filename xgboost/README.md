@@ -11,6 +11,8 @@ There are two kinds of nodes, master and worker, which work together to support 
 * ZooKeeper with Exhibitor for HA
 * Spark stand-alone cluster with HA using Zookeeper
 
+Reference [runtime topology](images/xgboost.jpg)
+
 ### Software Components
 
 As Docker container is used for some of the provision, Docker are installed on all nodes.
@@ -19,13 +21,15 @@ As Docker container is used for some of the provision, Docker are installed on a
 
 * ZooKeeper with Exhibitor in Docker
 * Spark stand-alone cluster master with HA using Zookeeper
+* XGBoost built for both C++ and Java
 
 #### Worker node details
 
 * Spark stand-alone cluster worker
+* XGBoost built for both C++ and Java
 
 
-### To provision:
+### Provision:
 
 * Clone or download repo.
 
@@ -57,6 +61,7 @@ Output would calculate SPARK_MASTER and ZK_MASTER, besides the list of master-ip
 |Wait Time for VM    | provision_vm_wait_time   |15   | You may need to adjust the value to make sure remote provisioner actions only start after VM is ready.|
 |Wait Time for ZK    | provision_zk_wait_time   |120  | You may need to adjust the value to make sure zookeeper dependent actions only start after ZK cluster is ready.|
 
+
 ### Run XGBoost Example
 
 XGBoost is download and built at `/root/xgboost` on all nodes
@@ -78,7 +83,7 @@ XGBoost is download and built at `/root/xgboost` on all nodes
 	spark-submit --class  ml.dmlc.xgboost4j.scala.example.spark.SparkWithDataFrame --master $SPARK_MASTER --jars /root/xgboost/jvm-packages/xgboost4j-spark/target/xgboost4j-spark-0.7-jar-with-dependencies.jar /root/xgboost/jvm-packages/xgboost4j-example/target/xgboost4j-example-0.7.jar 100 2 /root/xgboost/demo/data/agaricus.txt.train /root/xgboost/demo/data/agaricus.txt.test
 	
 
-#### Spark Submission from Master VM with test data on Softlayer Object Strorage (s3) 
+#### Spark Submission from Master VM with test data on Softlayer Object Storage (s3) 
 	
 	ssh -i do-key root@$MASTER_IP
 	
