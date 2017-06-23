@@ -114,9 +114,18 @@ resource "null_resource" "xgboost_master_install" {
       source = "./install/install_xgboost_spark.sh"
       destination = "/tmp/install_xgboost_spark.sh"
     }
+
+    provisioner "file" {
+      source = "./install/enable_nr.sh"
+      destination = "/tmp/enable_nr.sh"
+    }
    
 	provisioner "remote-exec" {
 	    inline = "echo install spark and xgboost && bash /tmp/install_xgboost_spark.sh > /tmp/installXgboostSpark.log"
+	}
+
+	provisioner "remote-exec" {
+	    inline = "if [ ! -z \"${var.nr_license}\" ]; then bash /tmp/enable_nr.sh ${var.nr_license} ${var.cluster_name} master > /tmp/enableNR.log ; fi"
 	}
 
 }
@@ -205,8 +214,16 @@ resource "null_resource" "xgboost_worker_install" {
       destination = "/tmp/install_xgboost_spark.sh"
     }
    
+    provisioner "file" {
+      source = "./install/enable_nr.sh"
+      destination = "/tmp/enable_nr.sh"
+    }
+
 	provisioner "remote-exec" {
 	    inline = "echo install spark and xgboost && bash /tmp/install_xgboost_spark.sh > /tmp/installXgboostSpark.log"
+	}
+	provisioner "remote-exec" {
+	    inline = "if [ ! -z \"${var.nr_license}\" ]; then bash /tmp/enable_nr.sh ${var.nr_license} ${var.cluster_name} worker > /tmp/enableNR.log; fi"
 	}
 
 }

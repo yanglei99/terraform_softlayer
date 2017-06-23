@@ -114,4 +114,9 @@ variable "master_public_ip" {
   default = true
 }
 
+variable "nr_license" {
+  description = "Your NewRelic License"
+  default = ""
+}
+
 

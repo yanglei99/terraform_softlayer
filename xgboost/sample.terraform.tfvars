@@ -30,3 +30,5 @@ provision_vm_wait_time=30
 provision_zk_wait_time=5
 
 master_public_ip=true
+
+nr_license = ""

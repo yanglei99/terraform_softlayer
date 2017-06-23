@@ -19,9 +19,9 @@ output "ZK_MASTER" {
 }
 
 output "SPARK_MASTER" {
-  value = "${ var.master_public_ip ? join(",",formatlist("%s:7077",softlayer_virtual_guest.xgboost_master.*.ipv4_address)) : join(",",formatlist("%s:7077",softlayer_virtual_guest.xgboost_master.*.ipv4_address_private))}"
+  value = "spark://${ var.master_public_ip ? join(",",formatlist("%s:7077",softlayer_virtual_guest.xgboost_master.*.ipv4_address)) : join(",",formatlist("%s:7077",softlayer_virtual_guest.xgboost_master.*.ipv4_address_private))}"
 }
 
 output "SPARK_MASTER_CLUSTER" {
-  value = "${ var.master_public_ip ? join(",",formatlist("%s:6066",softlayer_virtual_guest.xgboost_master.*.ipv4_address)) : join(",",formatlist("%s:6066",softlayer_virtual_guest.xgboost_master.*.ipv4_address_private))}"
+  value = "spark://${ var.master_public_ip ? join(",",formatlist("%s:6066",softlayer_virtual_guest.xgboost_master.*.ipv4_address)) : join(",",formatlist("%s:6066",softlayer_virtual_guest.xgboost_master.*.ipv4_address_private))}"
 }

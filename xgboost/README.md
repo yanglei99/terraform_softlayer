@@ -60,6 +60,8 @@ Output would calculate SPARK_MASTER and ZK_MASTER, besides the list of master-ip
 |Docker Installation | provision_install_docker |false| Default behavior is for CoreOS which already includes docker installation. For other OS, set it to true.|
 |Wait Time for VM    | provision_vm_wait_time   |15   | You may need to adjust the value to make sure remote provisioner actions only start after VM is ready.|
 |Wait Time for ZK    | provision_zk_wait_time   |120  | You may need to adjust the value to make sure zookeeper dependent actions only start after ZK cluster is ready.|
+|NewRelic License | nr_license |""| When not empty will be used to install and start NewRelic services for infrastructure monitoring...|
+
 
 
 ### Run XGBoost Example
