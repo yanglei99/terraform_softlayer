@@ -4,7 +4,7 @@ This example is converted from [Data Science Experience Lab in Python](https://a
 
 You can reference a similar Scala version of the Lab in [Zeppelin Notebook](./notebook/Lending_ML.json) and [Data Science Experience Jupyter Notebook](./notebook/Lending_ML.ipynb)
 
-Note: all activities on master node meed to follow [Prepare the Spark Submission Environment on a Master Node](../README.md)
+Note: all activities on master node need to follow [Prepare the Spark Submission Environment on a Master Node](../README.md)
 
 
 ### Build 
