@@ -1,8 +1,7 @@
 ## Spark XGBoost Example
 
-This example is converted from [Data Science Experience Lab in Python](https://apsportal.ibm.com/analytics/notebooks/78be018b-021c-431a-8408-c8c5b1b355b3/view?access_token=64b7542b28abfe6c60dc3c690fbf14095c47f0bd7b205afd2ffb65fdf21b7358) to integrate with XGBoost in a Spark Scala application. It uses the same [cleansed version of data](./lending/input/loan_sub_new.csv) originated from [Lending Club](https://www.lendingclub.com/info/download-data.action)
+This example is converted from [Data Science Experience Lab in Python](https://apsportal.ibm.com/analytics/notebooks/78be018b-021c-431a-8408-c8c5b1b355b3/view?access_token=64b7542b28abfe6c60dc3c690fbf14095c47f0bd7b205afd2ffb65fdf21b7358) to integrate with XGBoost in a Spark Scala application.  It uses the same [cleansed version of data](./lending/input/loan_sub_new.csv) originated from [Lending Club](https://www.lendingclub.com/info/download-data.action). You can reference a similar Scala version of the Lab in [Zeppelin Notebook](./notebook/Lending_ML.json) and [Data Science Experience Jupyter Notebook](./notebook/Lending_ML.ipynb)
 
-You can reference a similar Scala version of the Lab in [Zeppelin Notebook](./notebook/Lending_ML.json) and [Data Science Experience Jupyter Notebook](./notebook/Lending_ML.ipynb)
 
 Note: all activities on master node need to follow [Prepare the Spark Submission Environment on a Master Node](../README.md)
 
@@ -56,4 +55,5 @@ To enable eclipse IDE environment
 	
 	spark-submit --class "mytest.spark.LendingXGBoost" --master $SPARK_MASTER --conf spark.driver.memory=6g  --conf spark.driver.cores=3 --conf spark.executor.memory=6g --conf spark.executor.cores=4 --packages org.apache.hadoop:hadoop-aws:2.7.3 --properties-file /root/myspark.properties --jars /root/xgboost/jvm-packages/xgboost4j-spark/target/xgboost4j-spark-0.7-jar-with-dependencies.jar  ./target/scala-2.11/spark-xgboost-test-assembly.jar 100 6 s3a://lending
 
-	
+You can find the predication saved as Parquet under the s3://lending/results
+
