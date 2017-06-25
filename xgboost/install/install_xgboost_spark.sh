@@ -33,6 +33,11 @@ wget http://d3kbcqa49mib13.cloudfront.net/spark-2.1.0-bin-hadoop2.7.tgz
 mkdir -p /usr/local
 tar -xvzf spark-2.1.0-bin-hadoop2.7.tgz -C /usr/local
 
+# Download and install sbt (for sample)
+
+curl https://bintray.com/sbt/rpm/rpm | sudo tee /etc/yum.repos.d/bintray-sbt-rpm.repo
+yum install -y sbt
+
 # set environment variable
 echo 'export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.131-3.b12.el7_3.x86_64/jre/' >> ~/.bashrc
 echo 'export SPARK_HOME=/usr/local/spark-2.1.0-bin-hadoop2.7' >> ~/.bashrc

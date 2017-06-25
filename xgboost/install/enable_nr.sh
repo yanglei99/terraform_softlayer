@@ -13,7 +13,7 @@ sudo yum -q makecache -y --disablerepo='*' --enablerepo='newrelic-infra'
 sudo yum install newrelic-infra -y
 
 
-echo "export NRIA_CUSTOM_ATTRIBUTES='{\"cluster_name\":\"$2\",\"node_type\":\"$3\"}'" >> ~/.bashrc
+echo export NRIA_CUSTOM_ATTRIBUTES="'{\"cluster_name\":\"$2\",\"node_type\":\"$3\"}'" >> ~/.bashrc
 source ~/.bashrc
 
 env | grep NRIA_CUSTOM_ATTRIBUTES

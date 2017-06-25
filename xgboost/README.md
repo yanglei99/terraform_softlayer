@@ -81,7 +81,7 @@ XGBoost is download and built at `/root/xgboost` on all nodes
 	
 	# set the spark submission environment
 	
-	. ./setenv-spark-driver.sh
+	bash ./setenv-spark-driver.sh
 
 #### Upload test data to Object Storage (s3)
 
@@ -106,4 +106,4 @@ Create Spark Hadoop S3 configuration. [reference myspark.properties](myspark.pro
 ### Known issue, limitation and workaround
 
 * If you hit can not download library during spark submit on master, you may need to remove both `~/.m2` and `~/.ivy2/cache` 
-
+* Sometimes xgboost tracker python may not shutdown correctly. It will cause tracker using port other than 9091, which is blocked if you provision the cluster with using public ip for the master. Find the process and kill it will solve the problem. 
