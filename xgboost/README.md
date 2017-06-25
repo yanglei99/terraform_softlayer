@@ -64,7 +64,7 @@ Output would calculate SPARK_MASTER and ZK_MASTER, besides the list of master-ip
 
 
 
-### Run XGBoost Example
+### Run XGBoost Built-in Example
 
 XGBoost is download and built at `/root/xgboost` on all nodes
 
@@ -102,6 +102,10 @@ Create Spark Hadoop S3 configuration. [reference myspark.properties](myspark.pro
 
 	spark-submit --class  ml.dmlc.xgboost4j.scala.example.spark.SparkWithDataFrame --master $SPARK_MASTER --jars /root/xgboost/jvm-packages/xgboost4j-spark/target/xgboost4j-spark-0.7-jar-with-dependencies.jar --packages org.apache.hadoop:hadoop-aws:2.7.3 --properties-file myspark.properties /root/xgboost/jvm-packages/xgboost4j-example/target/xgboost4j-example-0.7.jar 100 3 s3a://xgboost/xgb-demo/train s3a://xgboost/xgb-demo/test
 
+
+### Other Examples
+
+[Reference](examples/README.md)
 
 ### Known issue, limitation and workaround
 

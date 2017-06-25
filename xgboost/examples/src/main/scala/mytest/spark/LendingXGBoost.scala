@@ -19,7 +19,7 @@ package mytest.spark
  *     
  *         loan_sub_new.csv
  * 
- *     Output model will be saved under <train_path>/results
+ *     Output model under <train_path>/results
  *     
  * To Run on a Master Node
  *
@@ -40,7 +40,10 @@ import org.apache.spark.ml.feature.StringIndexer
 import org.apache.spark.ml.feature.OneHotEncoder
 import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.ml.evaluation.RegressionEvaluator
-
+import ml.dmlc.xgboost4j.scala.spark.XGBoostEstimator
+import org.apache.spark.ml.{Pipeline, PipelineModel}
+import org.apache.spark.ml.tuning.{CrossValidator, CrossValidatorModel, ParamGridBuilder}
+import org.apache.spark.ml.PipelineModel
 
 
 object LendingXGBoost {
@@ -75,24 +78,20 @@ object LendingXGBoost {
   	val direct=trainPath+"/results/"+date+"-"+currentHour+"-"+currentMinute+"/"
   	println(s"output directory: $direct")
 	
-  	///read data from disk
-  	var df_data_1 = spark.read.option("header", "true").option("inferSchema", true).csv(trainPath + "/input/loan_sub_new.csv")
+  	println(s"Read data from $trainPath")
+  	var df_data = spark.read.option("header", "true").option("inferSchema", true).csv(trainPath + "/input/loan_sub_new.csv")
 	
-  	println("original schema")
-  	df_data_1.printSchema()
+  	df_data.printSchema()
+  	
   	//prepare data for ML
     //1. Convert label into label indices using the StringIndexer
-
-     val label_stringIdx = new StringIndexer()
+    val label_stringIdx = new StringIndexer()
         .setInputCol("default")
         .setOutputCol("label")
+    df_data = label_stringIdx.fit(df_data).transform(df_data)
   
-     df_data_1 = label_stringIdx.fit(df_data_1).transform(df_data_1)
-  
-     //2. One-hot encoder for all strings
-
+    //2. One-hot encoder for all strings
     val categoricalColumns = Array("term", "home_ownership", "verification_status", "purpose", "addr_state")
-
     for (categoricalCol <- categoricalColumns)
     {
        var strIndex =  new StringIndexer()
@@ -102,54 +101,55 @@ object LendingXGBoost {
               .setInputCol(categoricalCol+"Index")
               .setOutputCol(categoricalCol+"classVec")
               
-       df_data_1 = strIndex.fit(df_data_1).transform(df_data_1)
-       df_data_1 = oneHotEncoder.transform(df_data_1)  
-    }
-    
+       df_data = strIndex.fit(df_data).transform(df_data)
+       df_data = oneHotEncoder.transform(df_data)  
+     }
+ 
+    println("Transformed data before assembler")
+    df_data.printSchema()
+    df_data.show(5)
+
     // 3. Assemble feature vector
-  
     val numericCols = Array("loan_amnt", "int_rate", "annual_inc", "dti", "delinq_2yrs", "mths_since_last_delinq", "total_acc", "inq_last_6mths", "mths_since_last_record", "open_acc", "pub_rec", "collections_12_mths_ex_med", "acc_now_delinq")
     val assemblerInputs = categoricalColumns.map(c => c + "classVec") ++ numericCols
-  
     val assembler = new VectorAssembler()
       .setInputCols(assemblerInputs)
       .setOutputCol("features")
-  
-    df_data_1 = assembler.transform(df_data_1)
+      
+    val dataset = assembler.transform(df_data)
+    val mlDF = dataset.select("id","label", "features")
     
-    df_data_1 = df_data_1.select("id","label", "features")
+    println("Assembled into ML Model")
+    mlDF.printSchema()
+    mlDF.show()
     
-    println("transformed ML schema")
-    df_data_1.printSchema()
-    df_data_1.show()
-    
-    val Array(trainDF, testDF) = df_data_1.randomSplit(Array(0.7, 0.3), seed = 824)
+    val Array(trainDF, testDF) = dataset.randomSplit(Array(0.7, 0.3), seed = 824)
     val trainCount = trainDF.count()
     val testCount =  testDF.count()
-
-    println(s"VectorAssembler is done with train:$trainCount, test:$testCount")
+    println(s"Split data, train:$trainCount, test:$testCount")
     
 	  val trainingData = trainDF.select("label", "features")
     val testData = testDF.select("label", "features")
 
   	// training parameters
   	val paramMap = List(
-  	      "eta" -> 0.023f,
-  	      "max_depth" -> 10,
-  	      "min_child_weight" -> 3.0,
-  	      "subsample" -> 1.0,
-  	      "colsample_bytree" -> 0.82,
-  	      "colsample_bylevel" -> 0.9,
-  	      "base_score" -> 0.005,
-  	      "eval_metric" -> "auc",
-  	      "seed" -> 49,
-  	      "silent" -> 1,
-  	      "objective" -> "binary:logistic").toMap
+  			  "eta" -> 0.3,
+    	      "max_depth" -> 6,
+      	      "min_child_weight" -> 3.0,
+      	      "subsample" -> 1.0,
+      	      "colsample_bytree" -> 0.82,
+      	      "colsample_bylevel" -> 0.9,
+      	      "base_score" -> 0.005,
+      	      "eval_metric" -> "auc",
+      	      "seed" -> 49,
+      	      "silent" -> 1,
+      	      "objective" -> "binary:logistic").toMap
 
-  	println("Starting Xgboost ")
+  	println("Train Xgboost Model with DataFrame")
   	val xgBoostModelWithDF = XGBoost.trainWithDataFrame(trainingData, paramMap,round = numRound, nWorkers = numWorkers, useExternalMemory = true)
 	
-	  val predictions = xgBoostModelWithDF.setExternalMemory(true).transform(testData).select("label", "prediction", "probabilities")
+	 	println("Evaluate Model")
+    val predictions = xgBoostModelWithDF.setExternalMemory(true).transform(testData).select("label", "prediction", "probabilities")
 
 	  val evaluator = new RegressionEvaluator()
       .setLabelCol("label")
@@ -159,9 +159,51 @@ object LendingXGBoost {
     val rmse = evaluator.evaluate(predictions)
     println(s"Root mean squared error: $rmse")
 
-	  // Save the predication as Parquet files, maintaining the schema information
+    println("Persist Model and predicates")
+    xgBoostModelWithDF.write.save(direct+"myXgboostModel")
     predictions.write.save(direct+"predictions.parquet")
+
+    println("Create Pipeline")
+
+    val newParamMap = paramMap ++ Map[String, Any]("num_round" -> numRound, "nWorkers" -> numWorkers)
+    val xgboostEstimator = new XGBoostEstimator(newParamMap)
+
+    // construct the pipeline       
+    val pipeline = new Pipeline().setStages(Array(assembler, xgboostEstimator))
+    val pipelineModel = pipeline.fit(df_data)
     
-	}
+    pipelineModel.transform(df_data).show()
+    
+    println("Tune the Pipeline with Cross Validator")
+
+    val paramGrid = new ParamGridBuilder()
+      .addGrid(xgboostEstimator.maxDepth, Array(5, 12))
+      .addGrid(xgboostEstimator.eta, Array(0.005, 0.1))
+      .build()
+
+    val cv = new CrossValidator()
+      .setEstimator(xgboostEstimator)
+      .setEvaluator(evaluator)
+      .setEstimatorParamMaps(paramGrid)
+      .setNumFolds(4)
+
+    val cvModel = cv.fit(trainDF)
+    
+    println("Best model params")
+    println(cvModel.bestModel.extractParamMap)
+    
+    val results = cvModel.transform(testDF)
+    val rmse2 = evaluator.evaluate(results)
+    println(s"New root mean squared error: $rmse2")
+    
+    println("Persist the best Model and Pipeline")
+    
+    cvModel.bestModel.asInstanceOf[ml.dmlc.xgboost4j.scala.spark.XGBoostModel].write.save(direct+"/xgboostTunedModel")
+    pipelineModel.write.save(direct+"/xgPipeline")
+    
+    println("Reload the Pipeline Model")
+    val loadedPipeline = PipelineModel.load(direct+"/xgPipeline")
+    println(loadedPipeline)
+	  }
 
 	}
