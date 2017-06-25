@@ -8,7 +8,7 @@ This example is converted from [Data Science Experience Lab in Python](https://a
 
 #### Data Preparation
 
-* Load Data from user offered train directory, which contains `/input/loan_sub_new.csv`. 
+* Load Data from user offered train directory, which contains `input/loan_sub_new.csv`. 
 * Transform the raw data into `id, label, features` using [Spark transformers](https://spark.apache.org/docs/latest/ml-features.html)
 
 #### Training using XGBoost API
@@ -23,7 +23,7 @@ This example is converted from [Data Science Experience Lab in Python](https://a
 
 #### Model output
 
-* Save model, pipeline, predictions into train directory under `results\` with timestamp-ed sub-folder
+* Save model, pipeline, predictions into train directory under `results/` with timestamp-ed sub-folder
 
 
 ### Build 
