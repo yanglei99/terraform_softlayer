@@ -2,7 +2,12 @@
 
 echo enable New Relic
 
-echo "license_key: $1" | sudo tee -a /etc/newrelic-infra.yml
+cat >  /etc/newrelic-infra.yml  << FIN
+license_key: $1
+custom_attributes:
+  clusterName: $2
+  nodeType: $3
+FIN
 
 echo install New Relic
 
@@ -12,14 +17,9 @@ sudo yum -q makecache -y --disablerepo='*' --enablerepo='newrelic-infra'
 
 sudo yum install newrelic-infra -y
 
-
-echo export NRIA_CUSTOM_ATTRIBUTES="'{\"cluster_name\":\"$2\",\"node_type\":\"$3\"}'" >> ~/.bashrc
-source ~/.bashrc
-
-env | grep NRIA_CUSTOM_ATTRIBUTES
-
 echo start newrelic
 
+sudo systemctl stop newrelic-infra
 sudo systemctl start newrelic-infra
 
 echo download application Agent
