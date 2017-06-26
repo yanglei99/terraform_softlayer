@@ -145,3 +145,13 @@ variable "dcos_install_monitoring" {
   description = "Need to install monitoring (cAdvisor + InfluxDB + Grafana) or not."
   default = false
 }
+
+variable "nr_license" {
+  description = "Your NewRelic License"
+  default = ""
+}
+
+variable "enable_iptables" {
+  description = "Enable iptables"
+  default = "true"
+}

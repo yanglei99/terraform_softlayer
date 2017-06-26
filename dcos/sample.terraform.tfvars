@@ -18,26 +18,26 @@ dcos_install_monitoring = false
 #dcos_install_logging = false
 #dcos_install_monitoring = false
 
-master_cores= "2"
-master_memory = "4096"
+master_cores= "4"
+master_memory = "8192"
 master_disk = ["25"]
 master_network = 1000
 
-agent_cores= "2"
-agent_memory = "4096"
-agent_disk = ["25"]
+agent_cores= "4"
+agent_memory = "8192"
+agent_disk = ["100"]
 agent_network = 1000
 
-boot_cores= "2"
-boot_memory = "4096"
+boot_cores= "4"
+boot_memory = "8192"
 boot_disk = ["25"]
 boot_network = 1000
 
 dcos_cluster_name = "mydcos"
 
-dcos_master_count = "3"
+dcos_master_count = "1"
 
-dcos_agent_count = "2"
+dcos_agent_count = "3"
 
 dcos_public_agent_count = "2"
 
@@ -48,3 +48,7 @@ dcos_ssh_key_path = "./do-key"
 dcos_ssh_public_key_path = "./do-key.pub"
 
 wait_time_vm=30
+
+enable_iptables = "true"
+
+nr_license = ""

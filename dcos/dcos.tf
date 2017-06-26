@@ -6,7 +6,7 @@ provider "softlayer" {
 # This will create a new SSH key that will show up under the \
 # Devices>Manage>SSH Keys in the SoftLayer console.
 resource "softlayer_ssh_key" "terraform_dcos" {
-    label = "terraform_dcos_17"
+    label = "terraform_dcos"
     notes = "terraform key for dcos"
     public_key = "${file(var.dcos_ssh_public_key_path)}"
 }
@@ -27,7 +27,7 @@ resource "softlayer_virtual_guest" "dcos_bootstrap" {
     disks = "${var.boot_disk}"
 
 	provisioner "local-exec" {
-	    command = "echo BOOTSTRAP=\"${softlayer_virtual_guest.dcos_bootstrap.ipv4_address}\" >> ips.txt"
+	    command = "echo BOOTSTRAP=\"${softlayer_virtual_guest.dcos_bootstrap.ipv4_address_private}\" >> ips.txt"
 	}
 	  
     provisioner "local-exec" {
@@ -85,7 +85,7 @@ resource "null_resource" "dcos_bootstrap_install" {
     }
     
     provisioner "local-exec" {
-      command = "./make-files.sh"
+      command = "./make-files.sh {var.enable_iptables}"
     }
 
     provisioner "local-exec" {
@@ -108,13 +108,22 @@ resource "null_resource" "dcos_bootstrap_install" {
       source = "./config.yaml"
       destination = "$HOME/genconf/config.yaml"
     }
- 
+    
+    provisioner "file" {
+      source = "./do-install-bootstrap-iptables.sh"
+      destination = "/tmp/do-install-bootstrap-iptables.sh"
+    }
+
      provisioner "remote-exec" {
        inline = ["sudo bash $HOME/dcos_generate_config.sh",
               "docker run -d -p 4040:80 -v $HOME/genconf/serve:/usr/share/nginx/html:ro nginx 2>/dev/null",
               "docker run -d -p 2181:2181 -p 2888:2888 -p 3888:3888 --name=dcos_int_zk jplock/zookeeper 2>/dev/null"
               ]
     }
+
+	  provisioner "remote-exec" {
+	    inline = "bash /tmp/do-install-bootstrap-iptables.sh> /tmp/enable-iptables.log"
+	  }
     
 }
 
@@ -136,7 +145,7 @@ resource "softlayer_virtual_guest" "dcos_master" {
     disks = "${var.master_disk}"
   
   	provisioner "local-exec" {
-	    command = "echo ${format("MASTER_%02d", count.index)}=\"${self.ipv4_address}\" >> ips.txt"
+	    command = "echo ${format("MASTER_%02d", count.index)}=\"${self.ipv4_address_private}\" >> ips.txt"
 	}
 
     provisioner "local-exec" {
@@ -194,9 +203,19 @@ resource "null_resource" "dcos_master_install" {
 	    destination = "/tmp/do-install.sh"
 	  }
 
+	  provisioner "file" {
+	    source = "./install/enable_nr.sh"
+	    destination = "/tmp/enable_nr.sh"
+	  }
+
 	  provisioner "remote-exec" {
 	    inline = "bash /tmp/do-install.sh master  > /tmp/install-master.log"
 	  }
+
+	provisioner "remote-exec" {
+	    inline = "if [ ! -z \"${var.nr_license}\" ]; then bash /tmp/enable_nr.sh ${var.nr_license} ${var.dcos_cluster_name} master > /tmp/enableNR.log ; fi"
+	}
+	  
 }
 
 resource "softlayer_virtual_guest" "dcos_agent" {
@@ -274,9 +293,19 @@ resource "null_resource" "dcos_agent_install" {
 	    destination = "/tmp/do-install.sh"
 	  }
 	  
+	  provisioner "file" {
+	    source = "./install/enable_nr.sh"
+	    destination = "/tmp/enable_nr.sh"
+	  }
+
 	  provisioner "remote-exec" {
 	    inline = "bash /tmp/do-install.sh slave  > /tmp/install-slave.log"
 	  }
+	  
+	  provisioner "remote-exec" {
+		    inline = "if [ ! -z \"${var.nr_license}\" ]; then bash /tmp/enable_nr.sh ${var.nr_license} ${var.dcos_cluster_name} agent > /tmp/enableNR.log ; fi"
+	 }
+
 }
 
 
@@ -354,8 +383,18 @@ resource "null_resource" "dcos_public_agent_install" {
       source = "do-install.sh"
       destination = "/tmp/do-install.sh"
     }
+
+	  provisioner "file" {
+	    source = "./install/enable_nr.sh"
+	    destination = "/tmp/enable_nr.sh"
+	  }
+
   
     provisioner "remote-exec" {
       inline = "bash /tmp/do-install.sh slave_public > /tmp/install-slave-public.log"
     }
+    
+	provisioner "remote-exec" {
+		    inline = "if [ ! -z \"${var.nr_license}\" ]; then bash /tmp/enable_nr.sh ${var.nr_license} ${var.dcos_cluster_name} agent_public > /tmp/enableNR.log ; fi"
+	}
 }
