@@ -25,6 +25,9 @@ This example is converted from [Data Science Experience Lab in Python](https://a
 
 * Save model, pipeline, predictions into train directory under `results/` with timestamp-ed sub-folder
 
+#### Model reload
+
+* You can load model in the other applications for future machine learning!
 
 ### Build 
 
