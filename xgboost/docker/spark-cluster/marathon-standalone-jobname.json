@@ -9,7 +9,7 @@
 	"volumes": []
   },
   "acceptedResourceRoles": ["slave_public"],
-  "id": "spark-in-docker-standalone",
+  "id": "spark-standalone-jobname",
   "instances": 1,
   "cpus": 3,
   "mem": 6144,

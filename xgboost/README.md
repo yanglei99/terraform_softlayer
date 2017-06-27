@@ -2,6 +2,14 @@
 
 [Terraform](https://www.terraform.io/) configuration and scripts for provision Spark Cluster with XGBoost [Softlayer](https://softlayer.com/)
 
+The following describe how to start Spark Standalone cluster enhanced with XGBoost to run a prebuilt XGBoost Example. 
+
+For more scenarios, reference:
+
+* [Spark XGBoost Lending Example](examples/README.md)
+* [Docker approach to run Spark Cluster and Job Submission on Mesosphere DC/OS](docker/README.md)
+
+
 ### Cluster Topology
 
 There are two kinds of nodes, master and worker, which work together to support clusters of:
@@ -9,11 +17,11 @@ There are two kinds of nodes, master and worker, which work together to support 
 * ZooKeeper with Exhibitor for HA
 * Spark stand-alone cluster with HA using Zookeeper
 
-Reference [runtime topology](images/xgboost.jpg)
+Here is a sample [runtime topology](images/xgboost_spark.jpg)
 
 ### Software Components
 
-As Docker container is used for some of the provision, Docker are installed on all nodes.
+As Docker containers are used for some of the provisioning, Docker is installed on all nodes.
 
 #### Master node details
 
@@ -100,11 +108,6 @@ Create Spark Hadoop S3 configuration. [reference myspark.properties](myspark.pro
 
 	spark-submit --class  ml.dmlc.xgboost4j.scala.example.spark.SparkWithDataFrame --master $SPARK_MASTER --jars /root/xgboost/jvm-packages/xgboost4j-spark/target/xgboost4j-spark-0.7-jar-with-dependencies.jar --packages org.apache.hadoop:hadoop-aws:2.7.3 --properties-file myspark.properties /root/xgboost/jvm-packages/xgboost4j-example/target/xgboost4j-example-0.7.jar 100 3 s3a://xgboost/xgb-demo/train s3a://xgboost/xgb-demo/test
 
-
-### Other Scenarios
-
-* [Reference Lending Example](examples/README.md)
-* [Reference Docker approach to run Spark Cluster and Job Submission on Mesos](docker/README.md)
 
 ### Known issue, limitation and workaround
 

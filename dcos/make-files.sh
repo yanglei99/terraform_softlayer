@@ -72,6 +72,8 @@ iptables -A INPUT -p tcp -m tcp --dport 5051 -j ACCEPT
 # port for default Spark Cluster
 iptables -A INPUT -p tcp -m tcp --dport 4040 -j ACCEPT
 iptables -A INPUT -p tcp -m tcp --dport 8081 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 6066 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 7077 -j ACCEPT
 # port for default XGBoost tracker
 iptables -A INPUT -p tcp -m tcp --dport 9091 -j ACCEPT
 # drop every other inbound packet

@@ -1,0 +1,17 @@
+{
+  "id": "spark-slave-jobname",
+  "container": {
+    "docker": {
+        "image": "yanglei99/spark_xgboost_mesosphere",
+        "network": "HOST"
+    }
+  },
+  "cpus": 3,
+  "mem": 6144,
+  "env": {
+	  "SPARK_PROCESS_NAME":"slave",
+	  "SPARK_MASTER_ID":"spark-master"
+  },
+  "instances": 3,
+  "constraints": [["hostname", "UNIQUE"]]
+}

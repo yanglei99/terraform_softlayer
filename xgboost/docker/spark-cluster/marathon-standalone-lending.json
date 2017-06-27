@@ -1,0 +1,31 @@
+{
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+        "image": "yanglei99/spark_xgboost_mesosphere",
+        "network": "HOST",
+        "portMappings": [ ]
+    },
+	"volumes": [
+			      {
+			    	  "containerPath": "/spark/spark-xgboost-test-assembly.jar",
+			    	  "hostPath": "./spark-xgboost-test-assembly.jar",
+			          "mode": "RW"
+			      }
+			]
+  },
+  "acceptedResourceRoles": ["slave_public"],
+  "id": "spark-standalone-lending",
+  "instances": 1,
+  "cpus": 3,
+  "mem": 6144,
+  "uris": [
+           "https://s3-us-west-1.amazonaws.com/mydata.yl/spark-xgboost-test-assembly.jar"],
+  "env":{
+	  "SPARK_MASTER_HOST": "YOUR_MASTER_IP",
+	  "SPARK_JOB_CONFIG": "--conf spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem  --conf spark.driver.memory=6g --conf spark.driver.cores=3 --conf spark.executor.memory=6g --conf spark.executor.cores=3 --conf spark.hadoop.fs.s3a.endpoint=s3-api.us-geo.objectstorage.softlayer.net --conf spark.hadoop.fs.s3a.access.key=YOUR_ACCESS_KEY --conf spark.hadoop.fs.s3a.secret.key=YOUR_SECRET_KEY",
+	  "SPARK_JOB_PACKAGES": "--packages org.apache.hadoop:hadoop-aws:2.7.3",
+	  "SPARK_JOB_JARS": "--jars /spark/xgboost4j-spark-0.7-jar-with-dependencies.jar",
+	  "SPARK_JOB": "--class mytest.spark.LendingXGBoost /spark/spark-xgboost-test-assembly.jar 100 6 s3a://lending"
+  }
+}

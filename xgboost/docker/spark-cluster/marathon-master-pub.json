@@ -1,0 +1,18 @@
+{
+  "id": "spark-master-pub",
+  "container": {
+    "docker": {
+      "image": "yanglei99/spark_xgboost_mesosphere",
+      "network": "HOST"
+    }
+  },
+  "acceptedResourceRoles": ["slave_public"],
+  "cpus": 3,
+  "mem": 6144,
+  "env": {
+	  "SPARK_PROCESS_NAME":"master",
+	  "SPARK_USE_PRIVATE_NETWORK": "false"
+  },
+  "instances": 1,
+  "constraints": [["hostname", "UNIQUE"]]
+}

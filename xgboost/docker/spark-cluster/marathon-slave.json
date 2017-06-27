@@ -10,7 +10,7 @@
   "mem": 6144,
   "env": {
 	  "SPARK_PROCESS_NAME":"slave",
-	  "SPARK_MASTER_ID":"spark-master"
+	  "SPARK_MASTER_HOST":"YOUR_MASTER_IP"
   },
   "instances": 3,
   "constraints": [["hostname", "UNIQUE"]]
