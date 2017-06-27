@@ -103,8 +103,8 @@ Create Spark Hadoop S3 configuration. [reference myspark.properties](myspark.pro
 
 ### Other Scenarios
 
-[Reference Lending Example](examples/README.md)
-[Reference Docker approach to run Spark Cluster and Job Submission on Mesos](docker/README.md)
+* [Reference Lending Example](examples/README.md)
+* [Reference Docker approach to run Spark Cluster and Job Submission on Mesos](docker/README.md)
 
 ### Known issue, limitation and workaround
 

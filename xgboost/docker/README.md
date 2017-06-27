@@ -85,4 +85,4 @@ Note:
 
 ### Known issue and constraints
 
-* both against local master test and standalone in docker master test fails post training dataframe show. Investigating.
+* two test scenario failed:  against local master test and against standalone in docker master, during post training dataframe show. Investigating. 
