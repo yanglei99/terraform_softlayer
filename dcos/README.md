@@ -4,8 +4,6 @@ Terraform configuration and scripts for provision DC/OS on Softlayer, revised fr
 
 * This repo holds [Terraform](https://www.terraform.io/) scripts to create a 1, 3, or 5 master DCOS cluster on the [softlayer](https://softlayer.com/) provider.
 
-* Here is the [provision graph](graph.png)
-
 ##### Theory of Operation:
 
 This script will start the infrastructure machines (bootstrap and masters),

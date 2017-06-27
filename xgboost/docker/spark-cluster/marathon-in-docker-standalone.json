@@ -1,0 +1,24 @@
+{
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+        "image": "yanglei99/spark_xgboost_mesosphere",
+        "network": "HOST",
+        "portMappings": [ ]
+    },
+	"volumes": []
+  },
+  "acceptedResourceRoles": ["slave_public"],
+  "id": "spark-in-docker-standalone",
+  "instances": 1,
+  "cpus": 3,
+  "mem": 6144,
+  "uris": [],
+  "env":{
+	  "SPARK_MASTER_ID": "spark-master",
+	  "SPARK_JOB_CONFIG": "--conf spark.driver.memory=6g  --conf spark.driver.cores=3 --conf spark.executor.memory=6g --conf spark.executor.cores=3 --conf spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem --conf spark.hadoop.fs.s3a.endpoint=s3-api.us-geo.objectstorage.softlayer.net --conf spark.hadoop.fs.s3a.access.key=YOUR_ACCESS_KEY --conf spark.hadoop.fs.s3a.secret.key=YOUR_SECRET_KEY",
+	  "SPARK_JOB_PACKAGES": "--packages org.apache.hadoop:hadoop-aws:2.7.3",
+	  "SPARK_JOB_JARS": "--jars /spark/xgboost4j-spark-0.7-jar-with-dependencies.jar",
+	  "SPARK_JOB": "--class ml.dmlc.xgboost4j.scala.example.spark.SparkWithDataFrame /spark/xgboost4j-example-0.7.jar 100 3 s3a://xgboost/xgb-demo/train s3a://xgboost/xgb-demo/test"
+  }
+}
