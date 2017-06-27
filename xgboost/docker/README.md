@@ -86,4 +86,3 @@ Note:
 ### Known issue and constraints
 
 * both against local master test and standalone in docker master test fails post training dataframe show. Investigating.
-* Only support one Standalone Master in Docker at this time.

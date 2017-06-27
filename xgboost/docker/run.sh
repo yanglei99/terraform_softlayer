@@ -3,7 +3,7 @@
 echo calculate Spark Master Host
 
 if [ "$SPARK_MASTER_ID" != "" ]; then
-	text=$(curl -s $MARATHON_HOST/v2/apps/$SPARK_MASTER_ID | jq .app.tasks[].host | sed -e 's/"/''/g'| sed -n -e 1p)
+	text=$(curl -s $MARATHON_HOST/v2/apps/$SPARK_MASTER_ID | jq .app.tasks[].host | sed -e 's/"/''/g')
 	echo calculate Spark Master from $MARATHON_HOST/v2/app/$SPARK_MASTER_ID : $text
 	if [ "$text" != "" ]; then
 		export SPARK_MASTER_HOST=$text
@@ -11,7 +11,14 @@ if [ "$SPARK_MASTER_ID" != "" ]; then
 fi
 
 if [ "$SPARK_MASTER_HOST" != "" ]; then
-	export SPARK_MASTER=spark://$SPARK_MASTER_HOST:$SPARK_MASTER_PORT
+	echo calculate Spark Master from : $SPARK_MASTER_HOST
+    hosts=""
+    for word in $SPARK_MASTER_HOST
+    do
+            if [  ! -z "$hosts"  ]; then hosts+="," ;fi
+            hosts+="$word:$SPARK_MASTER_PORT"
+    done
+	export SPARK_MASTER=spark://$hosts
 fi
 
 echo calculate Spark Driver Host
