@@ -51,4 +51,11 @@ wait_time_vm=30
 
 enable_iptables = "true"
 
+enable_file_storage = true
+nfs_dir = "/shared_data"
+storage_type = "Endurance"
+storage_capacity = 20
+storage_iops = 2
+storage_snapshot_capacity = 10
+
 nr_license = ""

@@ -155,3 +155,33 @@ variable "enable_iptables" {
   description = "Enable iptables"
   default = "true"
 }
+
+variable "enable_file_storage" {
+  description = "Enable shared file storage"
+  default = false
+}
+
+variable "nfs_dir" {
+  description = "NFS directory"
+  default = "/shared_data"
+}
+
+variable "storage_type" {
+  description = "Softlayer File Storage Type"
+  default = "Endurance"
+}
+
+variable "storage_capacity" {
+  description = "Softlayer File Storage Capacity"
+  default = 20
+}
+
+variable "storage_iops" {
+  description = "Softlayer File Storage iops"
+  default = 0.25
+}
+
+variable "storage_snapshot_capacity" {
+  description = "Softlayer File Storage Snapshot Capacity"
+  default = 10
+}

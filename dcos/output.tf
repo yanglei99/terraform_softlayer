@@ -29,3 +29,8 @@ output "bootstrap-ip" {
 output "Use this link to access DCOS" {
   value = "http://${softlayer_virtual_guest.dcos_master.0.ipv4_address}/"
 }
+
+output "storage-mountpoint" {
+  value = "${softlayer_file_storage.storage.mountpoint }"
+}
+

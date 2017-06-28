@@ -151,7 +151,6 @@ resource "softlayer_virtual_guest" "dcos_master" {
     provisioner "local-exec" {
 	    command = "sleep ${var.wait_time_vm} && echo done waiting master VM ready"
     }
-      
   
 }
 
@@ -218,6 +217,23 @@ resource "null_resource" "dcos_master_install" {
 	  
 }
 
+
+resource "softlayer_file_storage" "storage" {
+
+		count = "${var.enable_file_storage}"
+		
+	    depends_on = ["softlayer_virtual_guest.dcos_agent","softlayer_virtual_guest.dcos_public_agent"]
+
+        type = "${var.storage_type}"
+        datacenter = "${var.softlayer_datacenter}"
+        capacity = "${var.storage_capacity}"
+        iops = "${var.storage_iops}"
+        
+        # Optional fields
+        allowed_virtual_guest_ids =  ["${concat(softlayer_virtual_guest.dcos_agent.*.id,softlayer_virtual_guest.dcos_public_agent.*.id)}"]
+        snapshot_capacity = "${var.storage_snapshot_capacity}"
+}
+
 resource "softlayer_virtual_guest" "dcos_agent" {
   
     count         = "${var.dcos_agent_count}"
@@ -239,14 +255,35 @@ resource "softlayer_virtual_guest" "dcos_agent" {
       provisioner "local-exec" {
 	    command = "sleep ${var.wait_time_vm} && echo done waiting agent VM ready"
       }
-      
-  
+     
 }
   
+
+resource "null_resource" "nfs-agent" {
+    
+    count = "${var.enable_file_storage * var.dcos_agent_count}"
+    depends_on = ["softlayer_file_storage.storage" ]
+    connection {
+	  user = "${var.softlayer_vm_user}"
+      private_key = "${file(var.dcos_ssh_key_path)}"
+      host = "${element(softlayer_virtual_guest.dcos_agent.*.ipv4_address, count.index)}"
+    }
+    
+    provisioner "file" {
+      source = "install/install_nfs.sh"
+      destination = "/tmp/install_nfs.sh"
+    }
+
+    provisioner "remote-exec" {
+	  inline = "bash /tmp/install_nfs.sh ${softlayer_file_storage.storage.mountpoint} ${var.nfs_dir} > /tmp/installNFS.log"
+	}
+
+}
+
 resource "null_resource" "dcos_agent_docker" {
     
     count = "${var.dcos_install_docker * var.dcos_agent_count}"
-    depends_on = ["softlayer_virtual_guest.dcos_agent"]
+    depends_on = ["null_resource.nfs-agent"]
     connection {
       user = "${var.softlayer_vm_user}"
       private_key = "${file(var.dcos_ssh_key_path)}"
@@ -330,14 +367,32 @@ resource "softlayer_virtual_guest" "dcos_public_agent" {
     provisioner "local-exec" {
 	    command = "sleep ${var.wait_time_vm} && echo done waiting public agent VM ready"
     }
-      
-
 }
   
+ resource "null_resource" "nfs-public-agent" {
+    
+    count = "${var.enable_file_storage * var.dcos_public_agent_count}"
+    depends_on = ["softlayer_file_storage.storage"]
+    connection {
+	  user = "${var.softlayer_vm_user}"
+      private_key = "${file(var.dcos_ssh_key_path)}"
+      host = "${element(softlayer_virtual_guest.dcos_public_agent.*.ipv4_address, count.index)}"
+    }
+    
+    provisioner "file" {
+      source = "install/install_nfs.sh"
+      destination = "/tmp/install_nfs.sh"
+    }
+
+    provisioner "remote-exec" {
+	  inline = "bash /tmp/install_nfs.sh ${softlayer_file_storage.storage.mountpoint} ${var.nfs_dir} > /tmp/installNFS.log"
+	}
+
+}
 resource "null_resource" "dcos_public_agent_docker" {
     
     count = "${var.dcos_install_docker * var.dcos_public_agent_count}"
-    depends_on = ["softlayer_virtual_guest.dcos_public_agent"]
+    depends_on = ["null_resource.nfs-public-agent"]
     connection {
       user = "${var.softlayer_vm_user}"
       private_key = "${file(var.dcos_ssh_key_path)}"
