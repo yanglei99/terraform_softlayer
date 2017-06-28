@@ -46,7 +46,7 @@ eventually install software.
 |Logging| dcos_install_logging|false | Set to true to enable [Logging Aggregation using ELK](./logging/README.md). Script is only tested for CENTOS. |
 |Monitoring| dcos_install_monitoring|false | Set to true to enable [Monitoring with cAdvisor,InfluxDB, Grafana](./monitoring/README.md).|
 |NewRelic License | nr_license |""| When not empty will be used to install and start NewRelic services for infrastructure monitoring...|
-
+|Enable Shared File System| enable_file_storage |false | When enabled, will create File Storage and mount as nfs on each agent, public agent as shared file system. Check other detailed attributes
 
 ### Known issues and workaround
 
