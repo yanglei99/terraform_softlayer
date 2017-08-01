@@ -2,6 +2,8 @@
 
 echo setup NFS: https://knowledgelayer.softlayer.com/procedure/accessing-file-storage-linux
 
+echo mount point: $1, directory: $2
+
 yum -y install nfs-utils nfs-utils-lib
 
 mkdir -p $2

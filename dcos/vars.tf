@@ -22,6 +22,11 @@ variable "softlayer_os_reference_code" {
   default = "COREOS_LATEST_64"
 }
 
+variable "softlayer_ssh_key_label" {
+  description = "Softlayer SSH key label"
+  default = "mykey"
+}
+
 variable "softlayer_vm_user" {
   description = "Softlayer OS VM user"
   default = "core"
@@ -111,6 +116,21 @@ variable "dcos_public_agent_count" {
   default = "1"
 }
 
+variable "dcos_bm_agent_count" {
+  description = "Number of baremetal agents to deploy"
+  default = "0"
+}
+
+variable "softlayer_bm_fixed_config" {
+  description = "Hourly BareMetal fixed config"
+  default = "D2620V4_128GB_2X800GB_SSD_RAID_1_K80_GPU2"
+}
+
+variable "enable_gpu" {
+  description = "Enable GPU installation"
+  default = true
+}
+
 variable "dcos_ssh_key_path" {
   description = "Path to your private SSH key path"
   default = "./do-key"
@@ -129,6 +149,11 @@ variable "dcos_installer_url" {
 variable "wait_time_vm" {
   description = "Wait time in second after VM up"
   default = "15"
+}
+
+variable "wait_time_bm" {
+  description = "Wait time in second after BM up"
+  default = "30"
 }
 
 variable "dcos_install_docker" {

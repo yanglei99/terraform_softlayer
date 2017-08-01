@@ -3,8 +3,8 @@ softlayer_user = ""
 softlayer_api_key = ""
 
 softlayer_domain = "yl.softlayer.com"
-softlayer_datacenter = "mex01"
-
+softlayer_datacenter = "sjc03"
+softlayer_ssh_key_label =  "key_mydcos"
 
 softlayer_os_reference_code = "CENTOS_LATEST_64"
 softlayer_vm_user = "root"
@@ -36,10 +36,13 @@ boot_network = 1000
 dcos_cluster_name = "mydcos"
 
 dcos_master_count = "1"
-
 dcos_agent_count = "3"
-
 dcos_public_agent_count = "2"
+
+dcos_bm_agent_count = "0"
+
+softlayer_bm_fixed_config = "D2620V4_128GB_2X800GB_SSD_RAID_1_K80_GPU2"
+enable_gpu = false
 
 dcos_installer_url = "https://downloads.dcos.io/dcos/EarlyAccess/dcos_generate_config.sh"
 
@@ -48,6 +51,7 @@ dcos_ssh_key_path = "./do-key"
 dcos_ssh_public_key_path = "./do-key.pub"
 
 wait_time_vm=30
+wait_time_bm=60
 
 enable_iptables = "true"
 

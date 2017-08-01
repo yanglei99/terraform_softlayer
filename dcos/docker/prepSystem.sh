@@ -4,7 +4,9 @@ echo reference "https://dcos.io/docs/1.9/administration/installing/custom/system
  
 echo Upgrade CentOS
 
-sudo yum upgrade -y
+sudo yum upgrade --assumeyes --tolerant
+sudo yum update --assumeyes
+
 sudo systemctl stop firewalld && sudo systemctl disable firewalld
 
 echo Enable OverlayFS
@@ -26,7 +28,8 @@ echo Advance setup
 
 sudo yum install -y tar xz unzip curl ipset
 
-sudo sed -i s/SELINUX=enforcing/SELINUX=permissive/g /etc/selinux/config 
+sudo sed -i s/SELINUX=enforcing/SELINUX=permissive/g /etc/selinux/config
 sudo groupadd nogroup
-  
+sudo groupadd docker
+
 sudo reboot

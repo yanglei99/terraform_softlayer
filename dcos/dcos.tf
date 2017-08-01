@@ -6,7 +6,7 @@ provider "softlayer" {
 # This will create a new SSH key that will show up under the \
 # Devices>Manage>SSH Keys in the SoftLayer console.
 resource "softlayer_ssh_key" "terraform_dcos" {
-    label = "terraform_dcos"
+    label = "${var.softlayer_ssh_key_label}"
     notes = "terraform key for dcos"
     public_key = "${file(var.dcos_ssh_public_key_path)}"
 }
@@ -186,16 +186,12 @@ resource "null_resource" "dcos_master_docker" {
 resource "null_resource" "dcos_master_install" {
 
     count = "${var.dcos_master_count}"
-    depends_on = ["null_resource.dcos_master_docker"]
+    depends_on = ["null_resource.dcos_bootstrap_install", "null_resource.dcos_master_docker"]
     connection {
       user = "${var.softlayer_vm_user}"
       private_key = "${file(var.dcos_ssh_key_path)}"
       host = "${element(softlayer_virtual_guest.dcos_master.*.ipv4_address, count.index)}"
     }
-
-	  provisioner "local-exec" {
-	    command = "while [ ! -f ./do-install.sh ]; do sleep 1; done"
-	  }
 
 	  provisioner "file" {
 	    source = "./do-install.sh"
@@ -222,7 +218,7 @@ resource "softlayer_file_storage" "storage" {
 
 		count = "${var.enable_file_storage}"
 		
-	    depends_on = ["softlayer_virtual_guest.dcos_agent","softlayer_virtual_guest.dcos_public_agent"]
+	    depends_on = ["softlayer_virtual_guest.dcos_agent","softlayer_virtual_guest.dcos_public_agent", "softlayer_bare_metal.dcos_bm_agent"]
 
         type = "${var.storage_type}"
         datacenter = "${var.softlayer_datacenter}"
@@ -231,13 +227,14 @@ resource "softlayer_file_storage" "storage" {
         
         # Optional fields
         allowed_virtual_guest_ids =  ["${concat(softlayer_virtual_guest.dcos_agent.*.id,softlayer_virtual_guest.dcos_public_agent.*.id)}"]
+		allowed_hardware_ids = ["${softlayer_bare_metal.dcos_bm_agent.*.id}"]
+		
         snapshot_capacity = "${var.storage_snapshot_capacity}"
 }
 
 resource "softlayer_virtual_guest" "dcos_agent" {
   
     count         = "${var.dcos_agent_count}"
-    depends_on = ["null_resource.dcos_bootstrap_install"]
 
     hostname = "${format("${var.dcos_cluster_name}-agent-%02d", count.index)}"
     domain =  "${var.softlayer_domain}"
@@ -259,7 +256,7 @@ resource "softlayer_virtual_guest" "dcos_agent" {
 }
   
 
-resource "null_resource" "nfs-agent" {
+resource "null_resource" "nfs_agent" {
     
     count = "${var.enable_file_storage * var.dcos_agent_count}"
     depends_on = ["softlayer_file_storage.storage" ]
@@ -277,13 +274,12 @@ resource "null_resource" "nfs-agent" {
     provisioner "remote-exec" {
 	  inline = "bash /tmp/install_nfs.sh ${softlayer_file_storage.storage.mountpoint} ${var.nfs_dir} > /tmp/installNFS.log"
 	}
-
 }
 
 resource "null_resource" "dcos_agent_docker" {
     
     count = "${var.dcos_install_docker * var.dcos_agent_count}"
-    depends_on = ["null_resource.nfs-agent"]
+    depends_on = ["null_resource.nfs_agent"]
     connection {
       user = "${var.softlayer_vm_user}"
       private_key = "${file(var.dcos_ssh_key_path)}"
@@ -313,19 +309,14 @@ resource "null_resource" "dcos_agent_install" {
 
     count = "${var.dcos_agent_count}"
     
-    depends_on = ["null_resource.dcos_agent_docker"]
+    depends_on = ["null_resource.dcos_bootstrap_install","null_resource.dcos_agent_docker"]
     connection {
       user = "${var.softlayer_vm_user}"
       private_key = "${file(var.dcos_ssh_key_path)}"
       host = "${element(softlayer_virtual_guest.dcos_agent.*.ipv4_address, count.index)}"
     }
 
-  
-	  provisioner "local-exec" {
-	    command = "while [ ! -f ./do-install.sh ]; do sleep 1; done"
-	  }
-
-	  provisioner "file" {
+  	  provisioner "file" {
 	    source = "do-install.sh"
 	    destination = "/tmp/do-install.sh"
 	  }
@@ -349,7 +340,6 @@ resource "null_resource" "dcos_agent_install" {
 resource "softlayer_virtual_guest" "dcos_public_agent" {
 
     count         = "${var.dcos_public_agent_count}"
-    depends_on = ["null_resource.dcos_bootstrap_install"]
 
     hostname = "${format("${var.dcos_cluster_name}-public-agent-%02d", count.index)}"
     domain =  "${var.softlayer_domain}"
@@ -369,7 +359,7 @@ resource "softlayer_virtual_guest" "dcos_public_agent" {
     }
 }
   
- resource "null_resource" "nfs-public-agent" {
+ resource "null_resource" "nfs_public_agent" {
     
     count = "${var.enable_file_storage * var.dcos_public_agent_count}"
     depends_on = ["softlayer_file_storage.storage"]
@@ -392,7 +382,7 @@ resource "softlayer_virtual_guest" "dcos_public_agent" {
 resource "null_resource" "dcos_public_agent_docker" {
     
     count = "${var.dcos_install_docker * var.dcos_public_agent_count}"
-    depends_on = ["null_resource.nfs-public-agent"]
+    depends_on = ["null_resource.nfs_public_agent"]
     connection {
       user = "${var.softlayer_vm_user}"
       private_key = "${file(var.dcos_ssh_key_path)}"
@@ -422,18 +412,13 @@ resource "null_resource" "dcos_public_agent_install" {
 
     count = "${var.dcos_public_agent_count}"
     
-    depends_on = ["null_resource.dcos_public_agent_docker"]
+    depends_on = ["null_resource.dcos_bootstrap_install","null_resource.dcos_public_agent_docker"]
     connection {
       user = "${var.softlayer_vm_user}"
       private_key = "${file(var.dcos_ssh_key_path)}"
       host = "${element(softlayer_virtual_guest.dcos_public_agent.*.ipv4_address, count.index)}"
     }
 
-
-    provisioner "local-exec" {
-      command = "while [ ! -f ./do-install.sh ]; do sleep 1; done"
-    }
-  
 	provisioner "file" {
       source = "do-install.sh"
       destination = "/tmp/do-install.sh"
