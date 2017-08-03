@@ -21,30 +21,10 @@ resource "softlayer_bare_metal" "dcos_bm_agent" {
     
 }
 
-resource "null_resource" "gpu_bm_agent" {
-    
-    count = "${var.enable_gpu * var.dcos_bm_agent_count}"
-    depends_on = ["softlayer_bare_metal.dcos_bm_agent"]
-    connection {
-	  user = "${var.softlayer_vm_user}"
-      private_key = "${file(var.dcos_ssh_key_path)}"
-      host = "${element(softlayer_bare_metal.dcos_bm_agent.*.public_ipv4_address, count.index)}"
-    }
-    
-    provisioner "file" {
-      source = "install/enable_gpu.sh"
-      destination = "/tmp/enable_gpu.sh"
-    }
-
-    provisioner "remote-exec" {
-	  inline = "bash /tmp/enable_gpu.sh  > /tmp/enableGPU.log"
-	}
-}
-
 resource "null_resource" "nfs_bm_agent" {
     
     count = "${var.enable_file_storage * var.dcos_bm_agent_count}"
-    depends_on = ["softlayer_file_storage.storage", "null_resource.gpu_bm_agent" ]
+    depends_on = ["softlayer_file_storage.storage" ]
     connection {
 	  user = "${var.softlayer_vm_user}"
       private_key = "${file(var.dcos_ssh_key_path)}"
@@ -92,11 +72,31 @@ resource "null_resource" "dcos_bm_agent_docker" {
 	}
 }
 
+resource "null_resource" "gpu_bm_agent" {
+    
+    count = "${var.enable_gpu * var.dcos_bm_agent_count}"
+    depends_on = ["null_resource.dcos_bm_agent_docker"]
+    connection {
+	  user = "${var.softlayer_vm_user}"
+      private_key = "${file(var.dcos_ssh_key_path)}"
+      host = "${element(softlayer_bare_metal.dcos_bm_agent.*.public_ipv4_address, count.index)}"
+    }
+    
+    provisioner "file" {
+      source = "install/enable_gpu.sh"
+      destination = "/tmp/enable_gpu.sh"
+    }
+
+    provisioner "remote-exec" {
+	  inline = "bash /tmp/enable_gpu.sh  > /tmp/enableGPU.log"
+	}
+}
+
 resource "null_resource" "dcos_bm_agent_install" {
 
     count = "${var.dcos_bm_agent_count}"
     
-    depends_on = ["null_resource.dcos_bootstrap_install","null_resource.dcos_bm_agent_docker"]
+    depends_on = ["null_resource.dcos_bootstrap_install","null_resource.gpu_bm_agent"]
     connection {
       user = "${var.softlayer_vm_user}"
       private_key = "${file(var.dcos_ssh_key_path)}"
@@ -122,3 +122,4 @@ resource "null_resource" "dcos_bm_agent_install" {
 	 }
 
 }
+

@@ -42,9 +42,10 @@ dcos_public_agent_count = "2"
 dcos_bm_agent_count = "0"
 
 softlayer_bm_fixed_config = "D2620V4_128GB_2X800GB_SSD_RAID_1_K80_GPU2"
-enable_gpu = false
+enable_gpu = true
 
-dcos_installer_url = "https://downloads.dcos.io/dcos/EarlyAccess/dcos_generate_config.sh"
+#dcos_installer_url = "https://downloads.dcos.io/dcos/EarlyAccess/dcos_generate_config.sh"
+dcos_installer_url = "https://downloads.dcos.io/dcos/stable/1.9.2/dcos_generate_config.sh?_ga=2.234161306.540963340.1501782101-96172467.1466007590"
 
 dcos_ssh_key_path = "./do-key"
 

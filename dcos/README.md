@@ -18,6 +18,34 @@ the cadre of agent nodes, which are  cut loose to provision metal and
 eventually install software.
 
 
+### Cluster Topology
+
+There are four kinds of nodes: bootstrap, master, agent, public agent, Bare Metal (with GPU option) agent. 
+You can use its specific count variable to control the number of nodes of the type.
+
+### Software Components
+
+Docker are installed on all nodes. Firewall rules are enabled
+
+#### Master node details
+
+* ZooKeeper with Exhibitor
+* Mesos Master
+* [option] NFS mount to a provisioned file storage
+* [option] Integration with NewRelic
+* [option] Logging and Monitoring
+
+####  all agent details
+
+* Mesos Agent (public or private)
+* [option] GPU kernel and CUDA on Bare Metal private agent node
+* [option] NFS mount to a provisioned file storage
+* [option] Integration with NewRelic
+* [option] Logging and Monitoring
+
+#### Verified 
+
+* DCOS: 1.9.2
 
 ### To use:
 
@@ -39,6 +67,8 @@ eventually install software.
 	
 #### Configuration Details
 
+Reference [vars.tf](./vars.tf) for more definitions
+
 | Scenario | Configuration | Default Value | Notes|
 |----------|---------------|-------|------|
 |Docker Installation | dcos_install_docker |false| Default behavior is for CoreOS which already includes docker installation. For other OS, set it to true.|
@@ -46,10 +76,12 @@ eventually install software.
 |Logging| dcos_install_logging|false | Set to true to enable [Logging Aggregation using ELK](./logging/README.md). Script is only tested for CENTOS. |
 |Monitoring| dcos_install_monitoring|false | Set to true to enable [Monitoring with cAdvisor,InfluxDB, Grafana](./monitoring/README.md).|
 |NewRelic License | nr_license |""| When not empty will be used to install and start NewRelic services for infrastructure monitoring...|
-|Enable Shared File System| enable_file_storage |false | When enabled, will create File Storage and mount as nfs on each agent, public agent as shared file system. Check other detailed attributes
+|Enable Shared File System| enable_file_storage |false | When enabled, will create File Storage and mount as nfs on each agent, public agent as shared file system. Check other detailed attributes|
+|Enable GPU on BareMetal Agent| enable_gpu |false | When enabled, will install NVIDIA M80 and CUDA|
 
 ### Known issues and workaround
 
 * Make sure you have enough public agents when Logging and/or Monitoring are enabled
+* Most of the optional capabilities are only tested on CENTOS
 
 
