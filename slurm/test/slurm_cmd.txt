@@ -1,0 +1,59 @@
+scontrol show nodes
+srun -N2 /bin/hostname
+scontrol show jobs
+squeue
+
+sinfo
+scontrol show partition
+
+
+srun -N2 -l /bin/hostname
+srun -n4 -l /bin/hostname
+
+cat > my.script << FIN
+#!/bin/sh
+#SBATCH --time=1
+/bin/hostname
+srun -l /bin/hostname
+srun -l /bin/pwd
+FIN
+
+sbatch -n4 -w "myslurm-worker-[00-01]" -o my.stdout my.script
+scontrol show job 10
+
+
+cat > my_dep.script << FIN
+
+#!/bin/sh
+#SBATCH --time=1
+/bin/hostname
+srun -l /bin/hostname
+srun -l /bin/pwd
+[root@myslurm-master-00 ~]# cat my1.script 
+#!/bin/bash
+#SBATCH --job-name="atest"
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=4
+#SBATCH --time=00:02:00
+#SBATCH -o stdout.%j
+#SBATCH -e stderr.%j
+#SBATCH --export=ALL
+
+#----------------------
+cd $SLURM_SUBMIT_DIR
+date
+srun -n 2 sleep 30
+date
+
+ls this_file_does_not_exist
+
+
+srun -n 2 hostname -s
+FIN
+
+
+sbatch -p debug my_dep.script
+sbatch --dependency=afterany:11 -p debug my_dep.script
+sbatch --dependency=afterany:24 -p debug my_dep.script
+squeue
+scontrol show job 10
