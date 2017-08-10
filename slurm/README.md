@@ -55,7 +55,7 @@ Log onto one of the node, run  commands like [slurm_cmd.txt](test/slurm_cmd.txt)
 |Wait Time for BareMetal  | wait_time_bm   | 30   | Adjust the value to make sure remote provisioner actions only start after BareMetal is ready.|
 |Slurm Configuration Template| |[slurm.conf](./install/slurm.conf.template) | Cluster related configuration are auto generated and add-on to the defaults |
 |Slurm cgroup configuration ||[cgroup.conf](./install/cgroup.conf), [cgroup_allowed_devices_file.conf](./install/cgroup_allowed_devices_file.conf) |
-|Enable GPU on BareMetal Agent| enable_gpu |false | When enabled, will install NVIDIA M80 and CUDA|
+|Enable GPU on BareMetal Worker| enable_gpu |false | When enabled, will install NVIDIA M80 and CUDA|
 
 
 ### Known issue, limitation and workaround
