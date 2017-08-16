@@ -30,6 +30,9 @@ Download Terraform Softlayer Provider binary and enable it in `~/.terraformrc`. 
 * [XGBoost Scenario](xgboost/README.md). Provision XGBoost Spark Cluster
 * [Data Ingestion Scenario](ingest/README.md). Provision Zookeeper, Spark, Kafka clusters for data ingestion.
 
+### Terraform UI
+
+* [Jupyter Notebook in Python3](ui/Terraform_UI.ipynb)
 
 ### Verified
 
