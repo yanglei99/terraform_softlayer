@@ -38,7 +38,7 @@ sudo ldconfig
 
 echo enable cuda
 
-yum install -y -epel-release
+yum install -y epel-release
 yum install -y dkms
 
 wget https://developer.nvidia.com/compute/cuda/8.0/Prod2/local_installers/cuda-repo-rhel7-8-0-local-ga2-8.0.61-1.x86_64-rpm

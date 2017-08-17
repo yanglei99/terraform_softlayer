@@ -98,7 +98,7 @@ if [ "$1" == "master" ]; then
 
 fi
 
-if [ "$1" != "master" || "$3" == "1" ]; then
+if [ "$1" != "master" ] || [ "$3" == "1" ]; then
 
   mkdir /var/spool/slurmd
   chown slurm: /var/spool/slurmd
