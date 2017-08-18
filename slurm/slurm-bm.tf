@@ -98,7 +98,7 @@ resource "null_resource" "bm_worker_install" {
 	}
 
     provisioner "remote-exec" {
-	  inline = "bash /tmp/install_slurm.sh worker ${var.nfs_dir} > /tmp/installSlurm.log"
+	  inline = "bash /tmp/install_slurm.sh worker ${var.nfs_dir} '' ${var.enable_gpu} > /tmp/installSlurm.log"
 	}
 
     provisioner "remote-exec" {

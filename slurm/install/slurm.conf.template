@@ -49,6 +49,6 @@ SlurmdLogFile=/var/log/slurmd.log
 # 
 # COMPUTE NODES 
 #NodeName=linux[1-32] CPUs=1 State=UNKNOWN 
-GresTypes=gpu 
 PartitionName=debug Nodes=ALL Default=YES MaxTime=INFINITE State=UP
+GresTypes=gpu
 

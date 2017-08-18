@@ -44,7 +44,7 @@ variable "softlayer_bm_fixed_config" {
 
 variable "softlayer_bm_fixed_config_cores" {
   description = "CPU cores for BM"
-  default = "16"
+  default = "32"
 }
 
 variable "softlayer_bm_fixed_config_gpu" {

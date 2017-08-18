@@ -1,11 +1,6 @@
 scontrol show nodes
-srun -N2 /bin/hostname
-scontrol show jobs
-squeue
-
 sinfo
 scontrol show partition
-
 
 srun -N2 -l /bin/hostname
 srun -n4 -l /bin/hostname
@@ -19,11 +14,10 @@ srun -l /bin/pwd
 FIN
 
 sbatch -n4 -w "myslurm-worker-[00-01]" -o my.stdout my.script
-scontrol show job 10
-
+scontrol show job 3
+squeue
 
 cat > my_dep.script << FIN
-
 #!/bin/sh
 #SBATCH --time=1
 /bin/hostname
@@ -53,7 +47,27 @@ FIN
 
 
 sbatch -p debug my_dep.script
-sbatch --dependency=afterany:11 -p debug my_dep.script
-sbatch --dependency=afterany:24 -p debug my_dep.script
+sbatch --dependency=afterany:4 -p debug my_dep.script
+sbatch --dependency=afterany:5 -p debug my_dep.script
 squeue
-scontrol show job 10
+scontrol show job 5
+
+
+==============GPU ====================
+
+cat > gres_test.sh << FIN
+#!/bin/bash
+#
+# gres_test.sh
+# Submit as follows:
+# sbatch --gres=gpu:4 -n4 -N1-1 gres_test.sh
+#
+srun --gres=gpu:2 -n2 --exclusive  hostname -s &
+srun --gres=gpu:1 -n1 --exclusive  hostname -s &
+srun --gres=gpu:1 -n1 --exclusive  hostname -s &
+wait
+
+FIN
+
+squeue
+scontrol show job 6

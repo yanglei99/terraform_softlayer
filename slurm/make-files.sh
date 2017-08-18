@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 
+echo enable iptables: $1, gpu: $2, $3
+
 # Make some config files
 
 cat cluster_info.txt
@@ -9,9 +11,13 @@ cat cluster_info.txt >> slurm.conf
 
 rm -rf cluster_info.txt
 
-
-
 # Make some scripts
+
+cat > gres.conf << FIN
+# Configure support for GPUs
+Name=gpu File=/dev/nvidia[0-$(($2 * $3 -1))]
+FIN
+
 
 cat > do-install-iptables.sh << FIN
 #!/usr/bin/env bash
@@ -49,7 +55,7 @@ service iptables save
 iptables -nvL
 FIN
 
-if [ "$1" != "true"]; then
+if [ "$1" != "1" ]; then
 	echo service iptables stop >> do-install-iptables.sh 
 fi
 

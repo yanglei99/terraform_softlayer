@@ -38,7 +38,7 @@ storage_iops = 2
 storage_snapshot_capacity = 10
 
 softlayer_bm_fixed_config = "D2620V4_128GB_2X800GB_SSD_RAID_1_K80_GPU2"
-softlayer_bm_fixed_config_cores = 16
+softlayer_bm_fixed_config_cores = 32
 softlayer_bm_fixed_config_gpu = 4
 enable_gpu = true
 

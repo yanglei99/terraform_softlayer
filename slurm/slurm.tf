@@ -103,7 +103,7 @@ resource "null_resource" "slurm_config" {
     }
 	
     provisioner "local-exec" {
-      command = "./make-files.sh {var.enable_iptables}"
+      command = "./make-files.sh ${var.enable_iptables} ${var.enable_gpu} ${var.softlayer_bm_fixed_config_gpu}"
     }
     
     provisioner "file" {
@@ -114,6 +114,11 @@ resource "null_resource" "slurm_config" {
     provisioner "file" {
       source = "install/cgroup.conf"
       destination = "${var.nfs_dir}/cgroup.conf"
+    }
+    
+    provisioner "file" {
+      source = "gres.conf"
+      destination = "${var.nfs_dir}/gres.conf.gpu"
     }
     
     provisioner "file" {

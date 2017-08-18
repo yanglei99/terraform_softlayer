@@ -2,7 +2,7 @@
 
 echo reference https://www.slothparadise.com/how-to-install-slurm-on-centos-7-cluster/ and https://wiki.fysik.dtu.dk/niflheim/Slurm_installation
 
-echo install $1 node, shared directory: $2, master is also compute: $3
+echo install $1 node, shared directory: $2, master is also compute: $3, worker with gpu: $4
 
 yum install -y rpm-build gcc openssl openssl-devel pam-devel numactl numactl-devel hwloc hwloc-devel lua lua-devel readline-devel rrdtool-devel ncurses-devel gtk2-devel man2html libibmad libibumad perl-Switch perl-ExtUtils-MakeMaker
 
@@ -81,6 +81,15 @@ echo slurm.conf is calculated and uploaded before the installation at $2/slurm.c
 echo start the service
 
 cp $2/*.conf /etc/slurm
+
+if [ "$4" == "1" ]; then
+
+   yes | cp $2/gres.conf.gpu /etc/slurm/gres.conf
+   nvidia-smi --persistence-mode=1 
+   
+   echo 'TODO change to use persistenced http://docs.nvidia.com/deploy/driver-persistence/index.html#persistence-daemon'
+
+fi
 
 if [ "$1" == "master" ]; then
 
