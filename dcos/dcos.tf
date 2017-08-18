@@ -6,8 +6,8 @@ provider "softlayer" {
 # This will create a new SSH key that will show up under the \
 # Devices>Manage>SSH Keys in the SoftLayer console.
 resource "softlayer_ssh_key" "terraform_dcos" {
-    label = "${var.softlayer_ssh_key_label}"
-    notes = "terraform key for dcos"
+    label = "key_${var.dcos_cluster_name}"
+    notes = "terraform key for ${var.dcos_cluster_name}"
     public_key = "${file(var.dcos_ssh_public_key_path)}"
 }
 

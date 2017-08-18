@@ -56,7 +56,11 @@ iptables -F
 # accept everything on loopback
 iptables -A INPUT -i lo -j ACCEPT
 # accept everything on private interface
-iptables -A INPUT -i eth0 -j ACCEPT
+if [ -d /sys/class/net/bond0 ]; then
+  iptables -A INPUT -i bond0 -j ACCEPT
+else
+  iptables -A INPUT -i eth0 -j ACCEPT
+fi
 # accept anything thats releated to connections already established
 iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 # accept some cluster needed ports

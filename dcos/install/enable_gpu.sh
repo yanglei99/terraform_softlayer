@@ -56,3 +56,6 @@ service nvidia-docker status
 echo Test nvidia-smi
 nvidia-docker run --rm nvidia/cuda nvidia-smi
 
+nvidia-smi --persistence-mode=1 
+nvidia-smi
+

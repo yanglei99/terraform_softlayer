@@ -4,7 +4,6 @@ softlayer_api_key = ""
 
 softlayer_domain = "yl.softlayer.com"
 softlayer_datacenter = "sjc03"
-softlayer_ssh_key_label =  "key_mydcos"
 
 softlayer_os_reference_code = "CENTOS_LATEST_64"
 softlayer_vm_user = "root"

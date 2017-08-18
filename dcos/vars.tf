@@ -22,11 +22,6 @@ variable "softlayer_os_reference_code" {
   default = "COREOS_LATEST_64"
 }
 
-variable "softlayer_ssh_key_label" {
-  description = "Softlayer SSH key label"
-  default = "mykey"
-}
-
 variable "softlayer_vm_user" {
   description = "Softlayer OS VM user"
   default = "core"
