@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+docker run -d --net=host --entrypoint "" netflixoss/exhibitor:1.5.2 java -cp exhibitor-1.0-jar-with-dependencies.jar -c zookeeper --port 8181 --zkconfigconnect 169.45.101.221:2181,169.45.101.215:2181,169.45.101.210:2181 --zkconfigzpath /exhibitor/config --zkconfigexhibitorport 8181 --zkconfigretry 2000:30 --hostname=$(ip addr show eth1 | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -1)
