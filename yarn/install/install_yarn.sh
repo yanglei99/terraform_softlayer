@@ -2,13 +2,11 @@
 
 echo reference https://unskilledcoder.github.io/hadoop/2016/12/10/hadoop-cluster-installation-basic-version.html
 
-echo install $1 node of $2
+echo install $1 node of $2 with Spark $3
 
 echo Install Yarn
 
 export VER=$2
-
-cd /home/hadoop
 
 wget http://mirrors.sonic.net/apache/hadoop/common/hadoop-$VER/hadoop-$VER.tar.gz
 tar -xvf hadoop-$VER.tar.gz
@@ -35,11 +33,6 @@ cp /tmp/hdfs-site.xml $HADOOP_HOME/etc/hadoop/hdfs-site.xml
 cp /tmp/mapred-site.xml $HADOOP_HOME/etc/hadoop/mapred-site.xml
 cp /tmp/yarn-site.xml $HADOOP_HOME/etc/hadoop/yarn-site.xml
   
-sudo -u hadoop bash << EOF
-whoami
-
 mkdir -p $HADOOP_HOME/tmp
 mkdir -p $HADOOP_HOME/hdfs/name
 mkdir -p $HADOOP_HOME/hdfs/data
-
-EOF

@@ -11,23 +11,6 @@ resource "softlayer_ssh_key" "terraform_yarn" {
     public_key = "${file(var.ssh_public_key_path)}"
 }
 
-resource "softlayer_file_storage" "storage" {
-
-		count = "${var.enable_file_storage}"
-		
-	    depends_on = ["softlayer_virtual_guest.yarn_master", "softlayer_virtual_guest.yarn_worker"]
-
-        type = "${var.storage_type}"
-        datacenter = "${var.softlayer_datacenter}"
-        capacity = "${var.storage_capacity}"
-        iops = "${var.storage_iops}"
-        
-        # Optional fields
-        allowed_virtual_guest_ids =  ["${concat(softlayer_virtual_guest.yarn_master.*.id,softlayer_virtual_guest.yarn_worker.*.id)}"]
-		
-        snapshot_capacity = "${var.storage_snapshot_capacity}"
-}
-
 resource "softlayer_virtual_guest" "yarn_master" {
 
     hostname = "${var.cluster_name}-master-00"
@@ -90,51 +73,9 @@ resource "softlayer_virtual_guest" "yarn_worker" {
     }
 }
 
-resource "null_resource" "nfs_master" {
-    
-    count = "${var.enable_file_storage}"
-    depends_on = ["softlayer_file_storage.storage" ]
-    connection {
-	  user = "${var.softlayer_vm_user}"
-      private_key = "${file(var.ssh_key_path)}"
-      host = "${softlayer_virtual_guest.yarn_master.ipv4_address}"
-    }
-    
-    provisioner "file" {
-      source = "install/install_nfs.sh"
-      destination = "/tmp/install_nfs.sh"
-    }
-
-    provisioner "remote-exec" {
-	  inline = "bash /tmp/install_nfs.sh ${softlayer_file_storage.storage.mountpoint} ${var.nfs_dir} > /tmp/installNFS.log"
-	}
-	
-}
-
-resource "null_resource" "nfs_worker" {
-    
-    count = "${var.enable_file_storage * var.worker_count}"
-    depends_on = ["softlayer_file_storage.storage" ]
-    connection {
-	  user = "${var.softlayer_vm_user}"
-      private_key = "${file(var.ssh_key_path)}"
-      host = "${element(softlayer_virtual_guest.yarn_worker.*.ipv4_address, count.index)}"
-    }
-    
-    provisioner "file" {
-      source = "install/install_nfs.sh"
-      destination = "/tmp/install_nfs.sh"
-    }
-
-    provisioner "remote-exec" {
-	  inline = "bash /tmp/install_nfs.sh ${softlayer_file_storage.storage.mountpoint} ${var.nfs_dir} > /tmp/installNFS.log"
-	}
-	
-}
-
 resource "null_resource" "prep_master" {
     
-    depends_on = ["null_resource.nfs_master" ]
+    depends_on = ["softlayer_virtual_guest.yarn_master" ]
     connection {
 	  user = "${var.softlayer_vm_user}"
       private_key = "${file(var.ssh_key_path)}"
@@ -154,7 +95,7 @@ resource "null_resource" "prep_master" {
 resource "null_resource" "prep_worker" {
     
     count = "${var.worker_count}"
-    depends_on = ["null_resource.nfs_worker" ]
+    depends_on = ["softlayer_virtual_guest.yarn_worker" ]
     connection {
 	  user = "${var.softlayer_vm_user}"
       private_key = "${file(var.ssh_key_path)}"
@@ -181,7 +122,7 @@ resource "null_resource" "yarn_config" {
     }
 	
     provisioner "local-exec" {
-      command = "./make-files.sh ${var.enable_iptables} ${var.hadoop_verion}"
+      command = "./make-files.sh ${var.enable_iptables} ${var.hadoop_version}"
     }
     
 }
@@ -226,21 +167,21 @@ resource "null_resource" "master_install" {
     }
 
     provisioner "file" {
-      source = "install/install_yarn.sh"
-      destination = "/tmp/install_yarn.sh"
-    }
-
-    provisioner "file" {
       source = "do-install-iptables.sh"
       destination = "/tmp/do-install-iptables.sh"
     }
 
     provisioner "remote-exec" {
-	  inline = "bash /tmp/install_yarn.sh master ${var.hadoop_verion} > /tmp/installYarn.log"
-	}
-
-    provisioner "remote-exec" {
 	  inline = "bash /tmp/do-install-iptables.sh > /tmp/installIptables.log"
+	}
+	
+	provisioner "file" {
+      source = "install/install_spark.sh"
+      destination = "/tmp/install_spark.sh"
+    }
+    
+    provisioner "remote-exec" {
+	  inline = "if [ ! -z \"${var.spark_version}\" ]; then bash /tmp/install_spark.sh ${var.spark_version} ${var.hadoop_version} > /tmp/installSpark.log; fi"
 	}
 
 }
@@ -250,7 +191,7 @@ resource "null_resource" "master_install" {
 resource "null_resource" "worker_install" {
     
     count = "${var.worker_count}"
-    depends_on = ["null_resource.master_install" , "null_resource.prep_worker"]
+    depends_on = ["null_resource.yarn_config" , "null_resource.prep_worker"]
     connection {
 	  user = "${var.softlayer_vm_user}"
       private_key = "${file(var.ssh_key_path)}"
@@ -271,6 +212,15 @@ resource "null_resource" "worker_install" {
 	  inline = "bash /tmp/do-install-iptables.sh > /tmp/installIptables.log"
 	}
 
+	provisioner "file" {
+      source = "install/install_spark.sh"
+      destination = "/tmp/install_spark.sh"
+    }
+    
+    provisioner "remote-exec" {
+	  inline = "if [ ! -z \"${var.spark_version}\" ]; then bash /tmp/install_spark.sh ${var.spark_version} ${var.hadoop_version} > /tmp/installSpark.log; fi"
+	}
+
 }
 
 resource "null_resource" "cluster-start" {
@@ -283,6 +233,11 @@ resource "null_resource" "cluster-start" {
     }
 
     provisioner "file" {
+      source = "install/install_yarn.sh"
+      destination = "/tmp/install_yarn.sh"
+    }
+
+    provisioner "file" {
       source = "do-ssh-copy-to-slave.sh"
       destination = "/tmp/do-ssh-copy-to-slave.sh"
     }
@@ -291,6 +246,10 @@ resource "null_resource" "cluster-start" {
       source = "install/start_yarn.sh"
       destination = "/tmp/start_yarn.sh"
     }
+
+    provisioner "remote-exec" {
+	  inline = "bash /tmp/install_yarn.sh master ${var.hadoop_version} > /tmp/installYarn.log"
+	}
 
     provisioner "remote-exec" {
 	  inline = "bash /tmp/do-ssh-copy-to-slave.sh ${var.hadoop_password} > /tmp/installSlaves.log"

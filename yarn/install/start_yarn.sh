@@ -6,3 +6,6 @@ hdfs namenode -format
 start-dfs.sh
 start-yarn.sh
 jps
+
+hdfs dfs -mkdir -p /user/root
+hdfs dfs -chown root:hadoop /user/root

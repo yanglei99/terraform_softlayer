@@ -10,18 +10,21 @@ There are 2 kinds of nodes: master, worker
 
 ### Software Version
 
-* Yarn 2.6.5 on CENTOS 7
+Configurable. Verified on the following version(s):
+
+* Yarn 2.6.5 or 2.7.4 on CENTOS 7
+* Spark 2.2.0
 
 #### Master node details
 
 * NameNode with ResourceManager
-* NFS mount to a provisioned file storage
+* [Option] Spark
 
 ####  Worker node details
 
 * DataNode with NodeManager
 * First Worker Node is configured as secondary NameNode
-* NFS mount to a provisioned file storage
+* [Option] Spark
 
 
 ### To use:
@@ -38,9 +41,9 @@ There are 2 kinds of nodes: master, worker
 
 	terraform apply
 	
-* Check status
+### Check status
 
-You need to [enable VPN to access](https://www.softlayer.com/VPN-Access) the private IP. 
+#### [enable VPN to access status WebUI](https://www.softlayer.com/VPN-Access) with private IP. 
 
     # For Yarn
 	http://$MASTER_PRIVATE_IP:8088/
@@ -48,7 +51,7 @@ You need to [enable VPN to access](https://www.softlayer.com/VPN-Access) the pri
     # For HDFS
 	http://$MASTER_PRIVATE_IP:50070/
 
-Or you can use SSH tunnel to access the status Web UI
+#### use SSH tunnel to access status WebUI with localhost
 
     # For Yarn
 	ssh -i do-key -L 8088:$MASTER_PRIVATE_IP:8088 root@$MASTER_PUBLIC_IP
@@ -66,6 +69,12 @@ Or you can use SSH tunnel to access the status Web UI
 |Wait Time for VM  | wait_time_vm   | 15   | Adjust the value to make sure remote provisioner actions only start after VM is ready.|
 
 
+### To Run Spark Job
+
+Log onto Master node with Spark enabled
+
+	spark-submit --master yarn --deploy-mode cluster $SPARK_HOME/examples/src/main/python/pi.py
+	
 ### Known issue, limitation and workaround
 
 * Provision has specific code for CENTOS and alike

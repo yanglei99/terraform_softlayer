@@ -18,7 +18,7 @@ master_disk = ["25"]
 master_network = 1000
 master_iscompute = false
 
-worker_cores= "4"
+worker_cores= "8"
 worker_memory = "8192"
 worker_disk = ["25"]
 worker_network = 1000
@@ -27,15 +27,9 @@ worker_count = "2"
 
 wait_time_vm=30
 
-enable_file_storage = false
-nfs_dir = "/shared_data"
-storage_type = "Endurance"
-storage_capacity = 20
-storage_iops = 2
-storage_snapshot_capacity = 10
-
 enable_iptables = false
 
-hadoop_verion = "2.6.5"
+hadoop_version = "2.7.1"
 hadoop_password = "hd123ps"
 
+spark_version = "spark-2.2.0-bin-hadoop2.7"

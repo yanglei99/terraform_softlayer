@@ -2,6 +2,8 @@
 
 echo reference https://unskilledcoder.github.io/hadoop/2016/12/10/hadoop-cluster-installation-basic-version.html
 
+sudo yum upgrade -y
+
 sudo yum install -y net-tools
 sudo yum install -y openssh-server
 sudo yum install -y wget
