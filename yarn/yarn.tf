@@ -114,7 +114,7 @@ resource "null_resource" "prep_worker" {
 
 resource "null_resource" "yarn_config" {
     
-	depends_on = ["softlayer_virtual_guest.yarn_master", "softlayer_virtual_guest.yarn_worker"]
+	depends_on = ["softlayer_virtual_guest.yarn_master", "softlayer_virtual_guest.yarn_worker", "softlayer_bare_metal.yarn_bm_worker"]
     connection {
 	  user = "${var.softlayer_vm_user}"
       private_key = "${file(var.ssh_key_path)}"
@@ -122,7 +122,7 @@ resource "null_resource" "yarn_config" {
     }
 	
     provisioner "local-exec" {
-      command = "./make-files.sh ${var.enable_iptables} ${var.hadoop_version}"
+      command = "./make-files.sh ${var.enable_iptables} ${var.hadoop_version} ${var.spark_version} ${var.enable_gpu * var.bm_worker_count}"
     }
     
 }
@@ -225,7 +225,7 @@ resource "null_resource" "worker_install" {
 
 resource "null_resource" "cluster-start" {
     
-    depends_on = ["null_resource.worker_install" ]
+    depends_on = ["null_resource.worker_install", "null_resource.bm_worker_install"]
     connection {
 	  user = "hadoop"
       password = "${var.hadoop_password}"
@@ -238,13 +238,8 @@ resource "null_resource" "cluster-start" {
     }
 
     provisioner "file" {
-      source = "do-ssh-copy-to-slave.sh"
-      destination = "/tmp/do-ssh-copy-to-slave.sh"
-    }
-
-    provisioner "file" {
-      source = "install/start_yarn.sh"
-      destination = "/tmp/start_yarn.sh"
+      source = "do-start-yarn.sh"
+      destination = "/tmp/do-start-yarn.sh"
     }
 
     provisioner "remote-exec" {
@@ -252,11 +247,7 @@ resource "null_resource" "cluster-start" {
 	}
 
     provisioner "remote-exec" {
-	  inline = "bash /tmp/do-ssh-copy-to-slave.sh ${var.hadoop_password} > /tmp/installSlaves.log"
-	}
-
-    provisioner "remote-exec" {
-	  inline = "bash /tmp/start_yarn.sh> /tmp/startYarn.log"
+	  inline = "bash /tmp/do-start-yarn.sh ${var.hadoop_password} > /tmp/startYarn.log"
 	}
 
 }

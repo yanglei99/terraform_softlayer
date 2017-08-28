@@ -24,7 +24,7 @@ variable "softlayer_os_reference_code" {
 
 variable "softlayer_vm_user" {
   description = "Softlayer OS VM user"
-  default = "core"
+  default = "root"
 }
 
 variable "ssh_key_path" {
@@ -117,4 +117,34 @@ variable "hadoop_password" {
 variable "spark_version" {
   description = "Spark Version"
   default = ""
+}
+
+variable "enable_gpu" {
+  description = "Enable GPU installation"
+  default = true
+}
+
+variable "softlayer_bm_fixed_config" {
+  description = "Hourly BareMetal fixed config"
+  default = "D2620V4_128GB_2X800GB_SSD_RAID_1_K80_GPU2"
+}
+
+variable "softlayer_bm_fixed_config_cores" {
+  description = "CPU cores for BM"
+  default = "32"
+}
+
+variable "softlayer_bm_fixed_config_gpu" {
+  description = "GPU cores for BM"
+  default = "4"
+}
+
+variable "bm_worker_count" {
+  description = "Number of baremetal workers to deploy"
+  default = "0"
+}
+
+variable "wait_time_bm" {
+  description = "Wait time in second after BM up"
+  default = "30"
 }

@@ -45,7 +45,7 @@ wget https://developer.nvidia.com/compute/cuda/8.0/Prod2/local_installers/cuda-r
 
 sudo rpm -i cuda-repo-rhel7-8-0-local-ga2-8.0.61-1.x86_64-rpm
 sudo yum clean all
-sudo yum install cuda
+sudo yum install -y cuda
 
 echo Install nvidia-docker and nvidia-docker-plugin
 wget -P /tmp https://github.com/NVIDIA/nvidia-docker/releases/download/v1.0.1/nvidia-docker-1.0.1-1.x86_64.rpm

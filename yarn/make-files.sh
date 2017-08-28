@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 
-echo version: $2 enable iptables: $1
+echo version: $2 , enable iptables: $1 , install spark: $3, install gpu: $4
 
 # Make some config files
 
 . ./setenv.txt
 mv hosts.txt etc.hosts
 mv slaves.txt hadoop.slaves
+
+if [ -f "bm-slaves.txt" ]; then
+  cat bm-slaves.txt >> hadoop.slaves
+fi
 
 cat >> etc.hosts << FIN
 
@@ -147,11 +151,21 @@ cat > yarn-site.xml << FIN
         <name>yarn.resourcemanager.webapp.address</name>
         <value>$MASTER_00:8088</value>
     </property>
+    <property>
+        <name>yarn.node-labels.fs-store.root-dir</name>
+        <value>hdfs://$MASTER_00:9000/yarn/node-labels/</value>
+    </property>
+    <property>
+        <name>yarn.node-labels.enabled</name>
+        <value>true</value>
+    </property>
 </configuration>
 FIN
 
-cat > do-ssh-copy-to-slave.sh << FIN
+cat > do-start-yarn.sh << FIN
 #!/usr/bin/env bash
+
+echo copy Hadoop to Slaves
 
 yes | ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
 
@@ -167,8 +181,46 @@ do
     scp -r -o StrictHostKeyChecking=no ~/.bashrc hadoop@\$line:~/.bashrc
     
 done
+
+echo start HDFS
+
+hdfs namenode -format
+start-dfs.sh
+
+echo create hdfs directory for node label
+
+hdfs dfs -mkdir -p /yarn/node-labels
+hdfs dfs -chown hadoop:hadoop /yarn
+hadoop fs -ls /yarn
+
+if [ ! -z "$3" ]; then
+
+echo create hdfs directory for Spark
+
+hdfs dfs -mkdir -p /user/root
+hdfs dfs -chown root:hadoop /user/root
+hadoop fs -ls /user
+
+fi
+
+echo start Yarn
+
+start-yarn.sh
+jps
+
+if [ "$4" != "0" ]; then
+
+echo add gpu label
+yarn rmadmin -addToClusterNodeLabels "gpu"
+
+fi
+
 FIN
 
+for line in $(cat bm-slaves.txt )
+do
+    echo "yarn rmadmin -replaceLabelsOnNode \"$line=gpu\" " >> do-start-yarn.sh
+done
 
 cat > do-install-iptables.sh << FIN
 #!/usr/bin/env bash
@@ -210,5 +262,6 @@ if [ "$1" != "1" ]; then
 	echo service iptables stop >> do-install-iptables.sh 
 fi
 
-
+rm bm-slaves.txt
 rm setenv.txt
+

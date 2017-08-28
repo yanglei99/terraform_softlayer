@@ -75,6 +75,11 @@ Log onto Master node with Spark enabled
 
 	spark-submit --master yarn --deploy-mode cluster $SPARK_HOME/examples/src/main/python/pi.py
 	
+	# For GPU
+	
+	spark-submit --master yarn --deploy-mode cluster --conf spark.yarn.executor.nodeLabelExpression=gpu --conf spark.yarn.am.nodeLabelExpression=gpu  $SPARK_HOME/examples/src/main/python/pi.py
+	
+	
 ### Known issue, limitation and workaround
 
 * Provision has specific code for CENTOS and alike

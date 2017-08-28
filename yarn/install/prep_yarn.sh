@@ -2,7 +2,9 @@
 
 echo reference https://unskilledcoder.github.io/hadoop/2016/12/10/hadoop-cluster-installation-basic-version.html
 
-sudo yum upgrade -y
+sudo yum upgrade --assumeyes --tolerant
+sudo yum update --assumeyes
+uname -r
 
 sudo yum install -y net-tools
 sudo yum install -y openssh-server
@@ -20,7 +22,7 @@ java -version
 echo set environment variable
 
 cat > /etc/profile.d/java.sh << FIN
-export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.141-1.b16.el7_3.x86_64
+export JAVA_HOME=\$(cd /usr/lib/jvm/java-1.8.0-openjdk-1.8.0*; pwd)
 export JRE_HOME=\$JAVA_HOME/jre
 export CLASSPATH=\$JAVA_HOME/lib:.
 export PATH=\$PATH:\$JAVA_HOME/bin
