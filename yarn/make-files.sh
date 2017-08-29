@@ -18,8 +18,6 @@ cat >> etc.hosts << FIN
 FIN
 
 
-# Make some scripts
-
 cat > core-site.xml << FIN
 <configuration>
 <property>
@@ -159,8 +157,72 @@ cat > yarn-site.xml << FIN
         <name>yarn.node-labels.enabled</name>
         <value>true</value>
     </property>
+    <property>
+        <name>yarn.nodemanager.resource.memory-mb</name>
+        <value>$VM_MEMORY</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.resource.cpu-vcores</name>
+        <value>$VM_CORES</value>
+    </property>
 </configuration>
 FIN
+
+cat > yarn-site-bm.xml << FIN
+
+<configuration>
+    <property>
+        <name>yarn.resourcemanager.hostname</name>
+        <value>$MASTER_00</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
+        <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.address</name>
+        <value>$MASTER_00:8032</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.scheduler.address</name>
+        <value>$MASTER_00:8030</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.resource-tracker.address</name>
+        <value>$MASTER_00:8031</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.admin.address</name>
+        <value>$MASTER_00:8033</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.webapp.address</name>
+        <value>$MASTER_00:8088</value>
+    </property>
+    <property>
+        <name>yarn.node-labels.fs-store.root-dir</name>
+        <value>hdfs://$MASTER_00:9000/yarn/node-labels/</value>
+    </property>
+    <property>
+        <name>yarn.node-labels.enabled</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.resource.memory-mb</name>
+        <value>$BM_MEMORY</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.resource.cpu-vcores</name>
+        <value>$BM_CORES</value>
+    </property>
+</configuration>
+FIN
+
+# Make some scripts
 
 cat > do-start-yarn.sh << FIN
 #!/usr/bin/env bash
@@ -179,8 +241,20 @@ do
     ssh-keyscan \$line >> ~/.ssh/known_hosts
     scp -r -o StrictHostKeyChecking=no ~/hadoop-$2 hadoop@\$line:~/
     scp -r -o StrictHostKeyChecking=no ~/.bashrc hadoop@\$line:~/.bashrc
-    
 done
+
+FIN
+
+if [ "$4" != "0" ]; then
+
+for line in $(cat bm-slaves.txt )
+do
+    echo "scp -r -o StrictHostKeyChecking=no /tmp/yarn-site-bm.xml hadoop@$line:~/hadoop-$2/etc/hadoop/yarn-site.xml" >> do-start-yarn.sh
+done
+
+fi
+
+cat >> do-start-yarn.sh << FIN
 
 echo start HDFS
 
@@ -193,7 +267,11 @@ hdfs dfs -mkdir -p /yarn/node-labels
 hdfs dfs -chown hadoop:hadoop /yarn
 hadoop fs -ls /yarn
 
+FIN
+
 if [ ! -z "$3" ]; then
+
+cat >> do-start-yarn.sh << FIN
 
 echo create hdfs directory for Spark
 
@@ -201,21 +279,54 @@ hdfs dfs -mkdir -p /user/root
 hdfs dfs -chown root:hadoop /user/root
 hadoop fs -ls /user
 
+FIN
+
 fi
+
+cat >> do-start-yarn.sh << FIN
 
 echo start Yarn
 
 start-yarn.sh
 jps
 
+FIN
+
 if [ "$4" != "0" ]; then
+
+cat >> do-start-yarn.sh << FIN
 
 echo add gpu label
 yarn rmadmin -addToClusterNodeLabels "gpu"
+yarn cluster --list-node-labels
 
-fi
+sed -i.bak '/<\/configuration>/d'  \$YARN_HOME/etc/hadoop/capacity-scheduler.xml
+
+cat >> \$YARN_HOME/etc/hadoop/capacity-scheduler.xml << EOF
+
+  <property>
+    <name>yarn.scheduler.capacity.root.default.accessible-node-labels</name>
+    <value>gpu</value>
+  </property>
+
+  <property>
+    <name>yarn.scheduler.capacity.root.accessible-node-labels.gpu.capacity</name>
+    <value>100</value>
+  </property>
+
+  <property>
+    <name>yarn.scheduler.capacity.root.default.accessible-node-labels.gpu.capacity</name>
+    <value>100</value>
+  </property>
+
+</configuration>
+EOF
+
+yarn rmadmin -refreshQueues
 
 FIN
+
+fi
 
 for line in $(cat bm-slaves.txt )
 do

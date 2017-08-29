@@ -22,10 +22,10 @@ output "bm-worker-ip-private" {
   value = "${join(",", softlayer_bare_metal.yarn_bm_worker.*.private_ipv4_address)}"
 }
 
-output "hdfs-status" {
+output "status-hdfs" {
   value = "${softlayer_virtual_guest.yarn_master.ipv4_address_private}:50070"
 }
 
-output "yarn-status" {
+output "status-yarn" {
   value = "${softlayer_virtual_guest.yarn_master.ipv4_address_private}:8088"
 }

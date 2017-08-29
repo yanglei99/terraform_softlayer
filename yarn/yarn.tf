@@ -121,6 +121,22 @@ resource "null_resource" "yarn_config" {
       host = "${softlayer_virtual_guest.yarn_master.ipv4_address}"
     }
 	
+  	provisioner "local-exec" {
+	    command = "echo VM_CORES=${var.worker_cores} >> setenv.txt"
+	}
+	
+  	provisioner "local-exec" {
+	    command = "echo VM_MEMORY=${var.worker_memory * 1024} >> setenv.txt"
+	}
+
+  	provisioner "local-exec" {
+	    command = "echo BM_CORES=${var.softlayer_bm_fixed_config_cores} >> setenv.txt"
+	}
+	
+  	provisioner "local-exec" {
+	    command = "echo BM_MEMORY=${var.softlayer_bm_fixed_config_memory * 1024} >> setenv.txt"
+	}
+
     provisioner "local-exec" {
       command = "./make-files.sh ${var.enable_iptables} ${var.hadoop_version} ${var.spark_version} ${var.enable_gpu * var.bm_worker_count}"
     }
@@ -164,6 +180,11 @@ resource "null_resource" "master_install" {
     provisioner "file" {
       source = "yarn-site.xml"
       destination = "/tmp/yarn-site.xml"
+    }
+
+    provisioner "file" {
+      source = "yarn-site-bm.xml"
+      destination = "/tmp/yarn-site-bm.xml"
     }
 
     provisioner "file" {

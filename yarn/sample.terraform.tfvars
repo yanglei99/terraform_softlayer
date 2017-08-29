@@ -14,6 +14,7 @@ ssh_public_key_path = "./do-key.pub"
 
 softlayer_bm_fixed_config = "D2620V4_128GB_2X800GB_SSD_RAID_1_K80_GPU2"
 softlayer_bm_fixed_config_cores = 32
+softlayer_bm_fixed_config_memory = 128
 softlayer_bm_fixed_config_gpu = 4
 enable_gpu = true
 

@@ -78,7 +78,13 @@ Log onto Master node with Spark enabled
 	# For GPU
 	
 	spark-submit --master yarn --deploy-mode cluster --conf spark.yarn.executor.nodeLabelExpression=gpu --conf spark.yarn.am.nodeLabelExpression=gpu  $SPARK_HOME/examples/src/main/python/pi.py
-	
+
+#### Check job status
+
+You need to either use the generated etc.hosts to append to /etc/hosts after enable VPN, or ssh tunnel into the worker node where the job runs
+
+	ssh -i do-key -L 8042:$WORKER_PRIVATE_IP:8042 root@$WORKER_PUBLIC_IP
+	http://localhost:8042/node/containerlogs/...
 	
 ### Known issue, limitation and workaround
 
