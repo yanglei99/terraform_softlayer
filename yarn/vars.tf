@@ -153,3 +153,13 @@ variable "wait_time_bm" {
   description = "Wait time in second after BM up"
   default = "30"
 }
+
+variable "enable_xgboost" {
+  description = "Enable XGBoost installation"
+  default = false
+}
+
+variable "xgboost_patch" {
+  description = "The patch for dmlc-core, such as the AWS_HOST enablement"
+  default = ""
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo version: $2 , enable iptables: $1 , install spark: $3, install gpu: $4
+echo version: $2 , enable iptables: $1 , install spark: $3, install gpu: $4, install xgboost: $5
 
 # Make some config files
 
@@ -118,6 +118,11 @@ cat > yarn-site.xml << FIN
 
 <configuration>
     <property>
+       <name>yarn.nodemanager.vmem-pmem-ratio</name>
+       <value>4</value>
+       <description>Ratio between virtual memory to physical memory when setting memory limits for containers</description>
+    </property>
+    <property>
         <name>yarn.resourcemanager.hostname</name>
         <value>$MASTER_00</value>
     </property>
@@ -171,6 +176,11 @@ FIN
 cat > yarn-site-bm.xml << FIN
 
 <configuration>
+    <property>
+       <name>yarn.nodemanager.vmem-pmem-ratio</name>
+       <value>4</value>
+       <description>Ratio between virtual memory to physical memory when setting memory limits for containers</description>
+    </property>
     <property>
         <name>yarn.resourcemanager.hostname</name>
         <value>$MASTER_00</value>
@@ -283,6 +293,19 @@ FIN
 
 fi
 
+if [ "$5" == "1" ]; then
+
+cat >> do-start-yarn.sh << FIN
+
+echo create hdfs directory for xgboost
+
+hdfs dfs -mkdir -p /tmp
+hdfs dfs -chown root:hadoop /tmp
+hadoop fs -ls /tmp
+
+FIN
+fi
+
 cat >> do-start-yarn.sh << FIN
 
 echo start Yarn
@@ -292,7 +315,7 @@ jps
 
 FIN
 
-if [ "$4" != "0" ]; then
+if [ "$4" == "1" ]; then
 
 cat >> do-start-yarn.sh << FIN
 

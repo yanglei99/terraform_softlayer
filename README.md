@@ -25,7 +25,7 @@ Download Terraform Softlayer Provider binary and enable it in `~/.terraformrc`. 
 * [Mesosphere DC/OS](dcos/README.md). Provision Mesosphere DC/OS cluster
 * [Kubernetes](k8s/README.md). Provision Kubernetes cluster
 * [Slurm](slurm/README.md). Provision Slurm cluster
-* [Yarn](yarn/README.md). Provision Yarn cluster
+* [Yarn](yarn/README.md). Provision Yarn cluster. With optional add-on Spark and XGBoost.
 
 ### Specific Cluster
 * [XGBoost Scenario](xgboost/README.md). Provision XGBoost Spark Cluster

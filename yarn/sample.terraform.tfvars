@@ -41,3 +41,6 @@ hadoop_version = "2.7.1"
 hadoop_password = "hd123ps"
 
 spark_version = "spark-2.2.0-bin-hadoop2.7"
+enable_xgboost = true
+
+xgboost_patch = "https://s3.amazonaws.com/xgboost.yl/fix_s3_host.patch"

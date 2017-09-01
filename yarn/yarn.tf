@@ -138,7 +138,7 @@ resource "null_resource" "yarn_config" {
 	}
 
     provisioner "local-exec" {
-      command = "./make-files.sh ${var.enable_iptables} ${var.hadoop_version} ${var.spark_version} ${var.enable_gpu * var.bm_worker_count}"
+      command = "./make-files.sh ${var.enable_iptables} ${var.hadoop_version} ${var.spark_version} ${var.enable_gpu * var.bm_worker_count} ${var.enable_xgboost}"
     }
     
 }
@@ -158,36 +158,6 @@ resource "null_resource" "master_install" {
     }
 	
     provisioner "file" {
-      source = "hadoop.slaves"
-      destination = "/tmp/hadoop.slaves"
-    }
-
-    provisioner "file" {
-      source = "core-site.xml"
-      destination = "/tmp/core-site.xml"
-    }
-    
-    provisioner "file" {
-      source = "hdfs-site.xml"
-      destination = "/tmp/hdfs-site.xml"
-    }
-
-    provisioner "file" {
-      source = "mapred-site.xml"
-      destination = "/tmp/mapred-site.xml"
-    }
-
-    provisioner "file" {
-      source = "yarn-site.xml"
-      destination = "/tmp/yarn-site.xml"
-    }
-
-    provisioner "file" {
-      source = "yarn-site-bm.xml"
-      destination = "/tmp/yarn-site-bm.xml"
-    }
-
-    provisioner "file" {
       source = "do-install-iptables.sh"
       destination = "/tmp/do-install-iptables.sh"
     }
@@ -200,7 +170,7 @@ resource "null_resource" "master_install" {
       source = "install/install_spark.sh"
       destination = "/tmp/install_spark.sh"
     }
-    
+
     provisioner "remote-exec" {
 	  inline = "if [ ! -z \"${var.spark_version}\" ]; then bash /tmp/install_spark.sh ${var.spark_version} ${var.hadoop_version} > /tmp/installSpark.log; fi"
 	}
@@ -246,7 +216,7 @@ resource "null_resource" "worker_install" {
 
 resource "null_resource" "cluster-start" {
     
-    depends_on = ["null_resource.worker_install", "null_resource.bm_worker_install"]
+    depends_on = ["null_resource.master_install","null_resource.worker_install", "null_resource.bm_worker_install"]
     connection {
 	  user = "hadoop"
       password = "${var.hadoop_password}"
@@ -254,9 +224,43 @@ resource "null_resource" "cluster-start" {
     }
 
     provisioner "file" {
+      source = "hadoop.slaves"
+      destination = "/tmp/hadoop.slaves"
+    }
+
+    provisioner "file" {
+      source = "core-site.xml"
+      destination = "/tmp/core-site.xml"
+    }
+    
+    provisioner "file" {
+      source = "hdfs-site.xml"
+      destination = "/tmp/hdfs-site.xml"
+    }
+
+    provisioner "file" {
+      source = "mapred-site.xml"
+      destination = "/tmp/mapred-site.xml"
+    }
+
+    provisioner "file" {
+      source = "yarn-site.xml"
+      destination = "/tmp/yarn-site.xml"
+    }
+
+    provisioner "file" {
+      source = "yarn-site-bm.xml"
+      destination = "/tmp/yarn-site-bm.xml"
+    }
+
+    provisioner "file" {
       source = "install/install_yarn.sh"
       destination = "/tmp/install_yarn.sh"
     }
+
+    provisioner "remote-exec" {
+	  inline = "bash /tmp/install_yarn.sh master ${var.hadoop_version} > /tmp/installYarn.log"
+	}
 
     provisioner "file" {
       source = "do-start-yarn.sh"
@@ -264,12 +268,29 @@ resource "null_resource" "cluster-start" {
     }
 
     provisioner "remote-exec" {
-	  inline = "bash /tmp/install_yarn.sh master ${var.hadoop_version} > /tmp/installYarn.log"
-	}
-
-    provisioner "remote-exec" {
 	  inline = "bash /tmp/do-start-yarn.sh ${var.hadoop_password} > /tmp/startYarn.log"
 	}
 
 }
+
+resource "null_resource" "master_install_xgboost" {
+    
+    depends_on = ["null_resource.cluster-start" ]
+    connection {
+	  user = "${var.softlayer_vm_user}"
+      private_key = "${file(var.ssh_key_path)}"
+      host = "${softlayer_virtual_guest.yarn_master.ipv4_address}"
+    }
+
+	provisioner "file" {
+      source = "install/install_xgboost.sh"
+      destination = "/tmp/install_xgboost.sh"
+    }
+
+    provisioner "remote-exec" {
+	  inline = "if [ \"${var.enable_xgboost}\" == \"1\" ]; then bash /tmp/install_xgboost.sh ${var.hadoop_version} ${var.xgboost_patch} > /tmp/installXGBoost.log; fi"
+	}
+
+}
+
 

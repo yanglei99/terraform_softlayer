@@ -6,24 +6,32 @@
 
 ### Cluster Topology
 
-There are 2 kinds of nodes: master, worker
+There are 3 kinds of nodes: master, worker, baremetal worker
 
 ### Software Version
 
 Configurable. Verified on the following version(s):
 
-* Yarn 2.6.5 or 2.7.4 on CENTOS 7
+* Yarn 2.6.5 or 2.7.1 on CENTOS 7
 * Spark 2.2.0
+* XGboost 0.7
 
 #### Master node details
 
 * NameNode with ResourceManager
 * [Option] Spark
+* [Option] XGBoost
 
 ####  Worker node details
 
 * DataNode with NodeManager
 * First Worker Node is configured as secondary NameNode
+* [Option] Spark
+
+####  Worker node details
+
+* DataNode with NodeManager
+* [Option] GPU libraries and cuda
 * [Option] Spark
 
 
@@ -69,7 +77,10 @@ Configurable. Verified on the following version(s):
 |Wait Time for VM  | wait_time_vm   | 15   | Adjust the value to make sure remote provisioner actions only start after VM is ready.|
 
 
-### To Run Spark Job
+### Submit Jobs
+
+
+#### Spark Jobs
 
 Log onto Master node with Spark enabled
 
@@ -79,13 +90,58 @@ Log onto Master node with Spark enabled
 	
 	spark-submit --master yarn --deploy-mode cluster --conf spark.yarn.executor.nodeLabelExpression=gpu --conf spark.yarn.am.nodeLabelExpression=gpu  $SPARK_HOME/examples/src/main/python/pi.py
 
-#### Check job status
 
-You need to either use the generated etc.hosts to append to /etc/hosts after enable VPN, or ssh tunnel into the worker node where the job runs
+#### XGBoost Jobs
+
+Log onto Master node with XGBoost enabled. If you run XGBoost in Spark, Spark also needs to be enabled.
+
+Before upload file to [S3 Object Storage on Softlayer](https://knowledgelayer.softlayer.com/procedure/connecting-cos-s3-using-s3cmd), change `~/.s3cfg` with S3 access key and secret
+
+	
+	export BUCKET=YOUR BUCKET
+
+	cd ~/xgboost
+
+	s3cmd put demo/data/agaricus.txt.train s3://${BUCKET}/xgb-demo/train/
+	s3cmd put demo/data/agaricus.txt.test s3://${BUCKET}/xgb-demo/test/
+    
+    
+##### Run Python Jobs
+
+	export AWS_ACCESS_KEY_ID=YOUR KEY
+	export AWS_SECRET_ACCESS_KEY=YOUR Secret
+	export AWS_HOST=s3-api.us-geo.objectstorage.softlayer.net
+    
+	cd ~/xgboost/demo/distributed-training
+
+	../../dmlc-core/tracker/dmlc-submit --cluster=yarn --num-workers=2 --worker-cores=2\
+    ../../xgboost mushroom.aws.conf nthread=2\
+    data=s3://${BUCKET}/xgb-demo/train\
+    eval[test]=s3://${BUCKET}/xgb-demo/test\
+    model_dir=s3://${BUCKET}/xgb-demo/model
+    
+    # look at generate model
+    s3cmd ls s3://${BUCKET}/xgb-demo/model/
+ 
+##### Run Spark Job
+   
+Create Spark Hadoop S3 configuration. Referenc [myspark.properties](myspark.properties)
+
+    spark-submit --class  ml.dmlc.xgboost4j.scala.example.spark.SparkWithDataFrame --master yarn --jars /root/xgboost/jvm-packages/xgboost4j-spark/target/xgboost4j-spark-0.7-jar-with-dependencies.jar --packages org.apache.hadoop:hadoop-aws:2.7.3 --properties-file myspark.properties /root/xgboost/jvm-packages/xgboost4j-example/target/xgboost4j-example-0.7.jar 100 2 s3a://${BUCKET}/xgb-demo/train s3a://${BUCKET}/xgb-demo/test
+        
+   
+##### Check job status
+
+From dashboard, you need to either use the generated etc.hosts to append to /etc/hosts after enable VPN, or ssh tunnel into the worker node where the job runs
 
 	ssh -i do-key -L 8042:$WORKER_PRIVATE_IP:8042 root@$WORKER_PUBLIC_IP
 	http://localhost:8042/node/containerlogs/...
+
+	
 	
 ### Known issue, limitation and workaround
 
 * Provision has specific code for CENTOS and alike
+* [XGBoost S3 patch](https://github.com/dmlc/xgboost/issues/2665) is created to support S3 Object Storage on Softlayer. Provision will automatically apply the patch when `xgboost_patch` is defined.
+* If you hit can not download library during spark submit on master, you may need to remove both `~/.m2` and `~/.ivy2` 
+
