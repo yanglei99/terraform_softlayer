@@ -26,6 +26,7 @@ Download Terraform Softlayer Provider binary and enable it in `~/.terraformrc`. 
 * [Kubernetes](k8s/README.md). Provision Kubernetes cluster
 * [Slurm](slurm/README.md). Provision Slurm cluster
 * [Yarn](yarn/README.md). Provision Yarn cluster. With optional add-on Spark and XGBoost.
+* [LSF](https://github.ibm.com/yanglei/terraform_lsf). Provision IBM Spectrum Scale LSF cluster.
 
 ### Specific Cluster
 * [XGBoost Scenario](xgboost/README.md). Provision XGBoost Spark Cluster
